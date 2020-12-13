@@ -1,0 +1,10 @@
+apply plugin: "java"
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+dependencies {
+    compile project(':core')
+    compile project(':gdx-backend-lwjgl')
+//    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+}

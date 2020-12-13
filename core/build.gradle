@@ -1,0 +1,24 @@
+apply plugin: "java"
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+dependencies {
+    compile project(':gdx')
+
+
+    // https://mvnrepository.com/artifact/com.dorkbox/TweenEngine
+//    compile group: 'com.dorkbox', name: 'TweenEngine', version: '7.1'
+//    compile "com.badlogicgames.gdx:gdx-freetype:1.9.11"
+    // https://mvnrepository.com/artifact/com.github.AlmasB/gdx-ai
+    // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-ai
+    compile group: 'com.badlogicgames.gdx', name: 'gdx-ai', version: '1.8.2'
+    // https://mvnrepository.com/artifact/com.badlogicgames.ashley/ashley
+    compile group: 'com.badlogicgames.ashley', name: 'ashley', version: '1.7.3'
+// https://mvnrepository.com/artifact/com.badlogicgames.box2dlights/box2dlights
+    compile group: 'com.badlogicgames.box2dlights', name: 'box2dlights', version: '1.5'
+
+    dependencies { compile "net.onedaybeard.artemis:artemis-odb:2.3.0" }
+
+
+
+}

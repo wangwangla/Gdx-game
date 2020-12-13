@@ -1,0 +1,8 @@
+apply plugin: "java"
+sourceSets.main.java.srcDirs = ["src"]
+sourceSets.main.resources.srcDirs = ["res"]
+
+dependencies {
+    compile project(":gdx")
+    compile fileTree(include: '*.jar', dir: 'libs')
+}

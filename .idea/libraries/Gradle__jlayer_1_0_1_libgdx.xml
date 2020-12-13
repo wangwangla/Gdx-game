@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: jlayer-1.0.1-libgdx">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/gdx-backend-lwjgl/libs/jlayer-1.0.1-libgdx.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

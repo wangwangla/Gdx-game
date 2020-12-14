@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: kryonet-9-7-14">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/core/libs/kryonet-9-7-14.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

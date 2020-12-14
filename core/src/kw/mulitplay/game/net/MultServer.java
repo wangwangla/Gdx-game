@@ -7,15 +7,19 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import kw.mulitplay.game.Message;
+import kw.mulitplay.game.position.VectorPosition;
 
-public class MultServer {
+public class MultServer{
     private Server server;
     public Array<Connection> array = new Array<>();
-    public void createServer(){
+    public MultServer(){
         server = new Server();
         server.start();
         Kryo kryo = server.getKryo();
+        kryo.register(int[][].class);
+        kryo.register(int[].class);
         kryo.register(Message.class);
+        kryo.register(VectorPosition.class);
         try {
             server.bind(7001,7002);
             initListener();
@@ -29,12 +33,18 @@ public class MultServer {
             @Override
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
+                if (object instanceof Message) {
+                    VectorPosition position = ((Message) object).getPosition();
+                    System.out.println("received"+position.getX()+"==="+position.getY());
+                }
             }
 
             @Override
             public void connected(Connection connection) {
                 super.connected(connection);
                 array.add(connection);
+                Message action = listener.action(null);
+                sendMessage(action);
             }
 
             @Override
@@ -45,9 +55,16 @@ public class MultServer {
         });
     }
 
-    public void sendMessage(){
+    public void sendMessage(Message action){
         for (Connection connection : array) {
-            connection.sendTCP("cc");
+            connection.sendTCP(action);
+            System.out.println(action.toString()+"===>发送消息！！！！！>");
         }
+    }
+
+    private NetListener listener;
+
+    public void setListener(NetListener listener) {
+        this.listener = listener;
     }
 }

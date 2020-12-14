@@ -1,12 +1,20 @@
 package kw.mulitplay.game.screen.panel;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 
 import java.util.ArrayDeque;
 
+import kw.mulitplay.game.Message;
 import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.actor.PackActor;
+import kw.mulitplay.game.net.MultClient;
+import kw.mulitplay.game.net.MultServer;
+import kw.mulitplay.game.net.NetListener;
+import kw.mulitplay.game.position.VectorPosition;
+import kw.mulitplay.game.screen.DScreen;
 import kw.mulitplay.game.screen.Player;
 import kw.mulitplay.game.screen.data.GameData;
 
@@ -25,20 +33,59 @@ public class GamePanel extends Group {
     private GameData data;
 
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
+
     public GamePanel(GameData data){
         this.data = data;
         setName("gamePanel");
         initData();   //准备数据
+    }
+
+    private void other(){
         initPlayer(); // 初始化玩家
-        initTable();  //初始化格子
         initPacker();  //初始化牌
         initTip();  // 初始化提示框
         controller(); //添加控制
     }
 
     private void initData() {
-        arr = data.shuffle();
+        initTable();  //初始化格子
+        if (Constant.isServer == Constant.SERVER){
+            arr = data.shuffle();
+            MultServer server ;
+            Constant.multServer = server = new MultServer();
+            server.setListener(new NetListener() {
+                @Override
+                public Message action(Message message) {
+                    Message arrMessage = new Message(arr);
+                    return arrMessage;
+                }
+            });
+            other();
+        }else if (Constant.isServer == Constant.CLIENT){
+            MultClient client = new MultClient("127.0.0.1");
+            Constant.multClient =client;
+            client.setListener(new NetListener() {
+                @Override
+                public Message action(Message message) {
+                    Gdx.app.postRunnable(()->{
+                        run(message);
+                    });
+                    return null;
+                }
+            });
+        }else {
+            arr = data.shuffle();
+        }
+
 //        ---->>>>>  发送消息
+
+    }
+
+    Thread thread;
+    public void run(Message message){
+        arr = message.getArr();
+        data.setArr(arr);
+        other();
     }
 
     private void initTip() {
@@ -82,8 +129,15 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
 //            ----->>>>> 发送消息
-
-
+            if (Constant.isServer == Constant.SERVER){
+                Message message = new Message();
+                message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+                Constant.multServer.sendMessage(message);
+            }else {
+                Message message = new Message();
+                message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+                Constant.multClient.senMessage(message);
+            }
             move(target);
         }
     };
@@ -121,7 +175,9 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
             //发送消息    ---->>>>
-
+            Message message = new Message();
+            message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+            Constant.multClient.senMessage(message);
 
             resetTip(false);
             if (target.getCurrentStatus() == Constant.FANMIAN){

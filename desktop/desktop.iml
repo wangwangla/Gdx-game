@@ -38,16 +38,17 @@
     <orderEntry type="library" exported="" name="Gradle: ashley-1.7.3" level="project" />
     <orderEntry type="library" exported="" name="Gradle: box2dlights-1.5" level="project" />
     <orderEntry type="library" exported="" name="Gradle: artemis-odb-2.3.0" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: kryonet-2.22.0-RC1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: gdx-box2d-1.6.2" level="project" />
     <orderEntry type="library" exported="" name="Gradle: gdx-1.9.8" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: kryo-2.24.0" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: jsonbeans-0.7" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: minlog-1.2" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: objenesis-2.1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: gdx-backend-lwjgl-natives" level="project" />
     <orderEntry type="library" exported="" name="Gradle: jlayer-1.0.1-libgdx" level="project" />
     <orderEntry type="library" exported="" name="Gradle: jorbis" level="project" />
     <orderEntry type="library" exported="" name="Gradle: lwjgl" level="project" />
+    <orderEntry type="library" exported="" scope="RUNTIME" name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug" level="project" />
+    <orderEntry type="library" exported="" scope="RUNTIME" name="Gradle: kryonet-9-7-14" level="project" />
+    <orderEntry type="library" exported="" scope="RUNTIME" name="Gradle: objenesis-2.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="Gradle: kryonet-9-7-14" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="Gradle: objenesis-2.1" level="project" />
   </component>
 </module>

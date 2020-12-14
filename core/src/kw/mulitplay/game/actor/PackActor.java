@@ -35,17 +35,25 @@ public class PackActor extends Group {
     }
 
     public PackActor(GameData data, int x, int y){
-        name = data.getArr()+"";
+        int i = data.getArr()[x][y];
+        name = i+"";
         setName(name);
         currentStatus = Constant.FANMIAN;
         useColor = blackColor;
         ower = 0;   //默認為0  ，為黑色
-        if (num>10){
-            num -= 10;
+        if (i>10){
+            i -= 10;
             useColor = redColor;
             ower = 1;
         }
-        this.num = num;
+        this.num = i;
+        if (num == 0){
+            System.out.println(x+"============"+y);
+            for (int[] ints : data.getArr()) {
+
+            }
+        }
+        System.out.println();
         bg = new Image(new Texture("white.png"));
         addActor(bg);
         fanPack = new Image(new Texture("pckback.png"));

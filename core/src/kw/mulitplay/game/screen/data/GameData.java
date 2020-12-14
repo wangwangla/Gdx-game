@@ -45,4 +45,8 @@ public class GameData{
     public String getCurrentPlay() {
         return currentPlay;
     }
+
+    public void setArr(int[][] arr) {
+        this.arr = arr;
+    }
 }

@@ -175,9 +175,10 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
             //发送消息    ---->>>>
-            Message message = new Message();
-            message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
-            Constant.multClient.senMessage(message);
+//
+//            Message message = new Message();
+//            message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+//            Constant.multClient.senMessage(message);
 
             resetTip(false);
             if (target.getCurrentStatus() == Constant.FANMIAN){

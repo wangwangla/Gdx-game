@@ -47,3 +47,21 @@ libgdx  +  kryo
 ## 下一个案例
 
 打砖块
+
+
+
+## 游戏截图
+
+![loading](images/loading.png)
+
+
+
+
+
+![main](images/main-1607956473808.png)
+
+
+
+
+
+![games](images/games.png)

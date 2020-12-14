@@ -10,7 +10,8 @@ public class MainApp {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 360;
 		config.height = 640;
+		config.x = 1000;
+		config.y = 900;
 		new LwjglApplication(new MulitPlayGame(), config);
-//        new LwjglApplication(new App(), config);
     }
 }

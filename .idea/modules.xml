@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Game.iml" filepath="$PROJECT_DIR$/.idea/modules/Game.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Game.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Game.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/Game.core.iml" filepath="$PROJECT_DIR$/.idea/modules/core/Game.core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/desktop/Game.desktop.iml" filepath="$PROJECT_DIR$/.idea/modules/desktop/Game.desktop.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gdx/Game.gdx.iml" filepath="$PROJECT_DIR$/.idea/modules/gdx/Game.gdx.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gdx-backend-lwjgl/Game.gdx-backend-lwjgl.iml" filepath="$PROJECT_DIR$/.idea/modules/gdx-backend-lwjgl/Game.gdx-backend-lwjgl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Gdx-game.iml" filepath="$PROJECT_DIR$/Gdx-game.iml" group="Gdx-game" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="Gdx-game/app" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" group="Gdx-game/core" />
+      <module fileurl="file://$PROJECT_DIR$/desktop/desktop.iml" filepath="$PROJECT_DIR$/desktop/desktop.iml" group="Gdx-game/desktop" />
+      <module fileurl="file://$PROJECT_DIR$/gdx/gdx.iml" filepath="$PROJECT_DIR$/gdx/gdx.iml" group="Gdx-game/gdx" />
+      <module fileurl="file://$PROJECT_DIR$/gdx-backend-lwjgl/gdx-backend-lwjgl.iml" filepath="$PROJECT_DIR$/gdx-backend-lwjgl/gdx-backend-lwjgl.iml" group="Gdx-game/gdx-backend-lwjgl" />
     </modules>
   </component>
 </project>

@@ -199,7 +199,9 @@ public class GamePanel extends Group {
             // 默認playA是第一個節拍的
             if (A.OWNER == -1) {
                 A.OWNER = target.getOwer();
+                A.color = target.getUseColor();
                 B.OWNER = (short) (1-target.getOwer());
+                B.color = target.getOtherColor();
             }
             changePlayer();
             if (packActors.size()!=0){

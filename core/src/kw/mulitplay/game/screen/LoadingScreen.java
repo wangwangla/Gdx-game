@@ -41,7 +41,7 @@ public class LoadingScreen extends BaseScreen {
         time +=  delta;
         if (time>2){
             out = true;
-            Constant.game.setScreen(new MainScreen());
+            enterScreen(new MainScreen());
         }
     }
 }

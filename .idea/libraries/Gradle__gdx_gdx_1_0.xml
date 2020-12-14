@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: Game.gdx.gdx-1.0">
+  <library name="Gradle: gdx.gdx-1.0">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/gdx/build/libs/gdx-1.0.jar!/" />
     </CLASSES>

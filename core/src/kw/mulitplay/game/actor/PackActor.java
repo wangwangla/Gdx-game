@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import java.util.HashMap;
 
 import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.asset.FontResource;
@@ -57,12 +56,11 @@ public class PackActor extends Group {
         addActor(zhengPack);
         zhengPack.setPosition(getWidth(),0,Align.bottomRight);
         name = data.getAnimalData().get(num);
-        animalLabel = new Label("x",new Label.LabelStyle(){{font = FontResource.font;}});
+        animalLabel = new Label(name,new Label.LabelStyle(){{font = FontResource.animalfont;}});
         addActor(animalLabel);
         animalLabel.setColor(useColor);
         animalLabel.setAlignment(Align.center);
-        animalLabel.setFontScale(5);
-        animalLabel.setPosition(20,getHeight()-20, Align.topLeft);
+        animalLabel.setPosition(20,getHeight()-20, Align.center);
         addActor(fanPack);
     }
 
@@ -107,6 +105,10 @@ public class PackActor extends Group {
         remove();
     }
 
+    public Color getOtherColor() {
+        return useColor == redColor ? blackColor : redColor;
+    }
+
     public interface TachListener{
         public void action(PackActor actor);
     }
@@ -118,5 +120,9 @@ public class PackActor extends Group {
     public void setAnimalScale(float scale){
         setOrigin(Align.center);
         setScale(scale,scale);
+    }
+
+    public Color getUseColor() {
+        return useColor;
     }
 }

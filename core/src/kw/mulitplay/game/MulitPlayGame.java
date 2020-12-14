@@ -14,9 +14,13 @@ public class MulitPlayGame extends Game {
     private Viewport viewport;
     @Override
     public void create() {
+        //create viewport and as a constant
         Constant.viewport = viewport = new ExtendViewport(720,1280);
+        // call to set value Constant.width and Constant.height
         resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        //create batch
         Constant.batch = new CpuSpriteBatch();
+        //loading
         setScreen(new LoadingScreen());
         Constant.game = this;
     }

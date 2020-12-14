@@ -36,9 +36,11 @@ public class MainScreen extends BaseScreen {
         button2.setName("button2");
     }
 
+    //this method only add listener to button
     @Override
     protected void initListener() {
         Actor button = stage.getRoot().findActor("button");
+        //one device play  ,sad ,not write ai,so need two player use one device.
         button.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -46,6 +48,7 @@ public class MainScreen extends BaseScreen {
                 Constant.isServer = Constant.NOMAL;
             }
         });
+        //one net connnect;
         Actor button2 = stage.getRoot().findActor("button2");
         button2.addListener(new ClickListener(){
             @Override
@@ -66,6 +69,7 @@ public class MainScreen extends BaseScreen {
         tipGroup.addActor(serverLabel);
         serverLabel.setColor(Color.BLACK);
         serverLabel.setPosition(Constant.width*0.2F,tipGroup.getY(Align.center),Align.center);
+        //server
         serverLabel.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -80,6 +84,7 @@ public class MainScreen extends BaseScreen {
         clientLabel.setColor(Color.BLACK);
         clientLabel.setPosition(Constant.width*0.7F,tipGroup.getY(Align.center),Align.center);
         clientLabel.setDebug(true);
+        //client
         clientLabel.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {

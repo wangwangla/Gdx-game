@@ -9,6 +9,9 @@ import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
 
+/**
+ * all screen extends BaseScreen
+ */
 public class LoadingScreen extends BaseScreen {
 
     private boolean out;
@@ -18,7 +21,9 @@ public class LoadingScreen extends BaseScreen {
     protected void initView() {
         Image image = new Image(new Texture("splash.png"));
         stage.addActor(image);
+        //init font resource
         new FontResource();
+        //init resource
         Constant.resource = new Resource();
     }
 

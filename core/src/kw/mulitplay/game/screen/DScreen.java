@@ -59,6 +59,7 @@ public class DScreen extends BaseScreen {
         currentPlayer.setAlignment(Align.center);
         currentPlayer.setPosition(Constant.width/2,timeLabel.getY(Align.center),Align.center);
         stage.addActor(currentPlayer);
+        //note : this class important
         GamePanel panel = new GamePanel(data);
         panel.setPosition(Constant.width/2,Constant.height*0.42F,Align.center);
         stage.addActor(panel);

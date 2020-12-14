@@ -2,6 +2,7 @@ package kw.mulitplay.game.screen;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -17,6 +18,15 @@ import kw.mulitplay.game.screen.panel.GamePanel;
 public class DScreen extends BaseScreen {
     private GameData data;
     private Label timeLabel;
+    private float time = 0;
+    private int current = 0;
+    private Label currentPlayer;
+
+    @Override
+    protected void initData() {
+        data = new GameData();
+    }
+
     @Override
     protected void initView() {
         Image head = new Image(new Texture("white.png"));
@@ -29,13 +39,13 @@ public class DScreen extends BaseScreen {
         content.setSize(Constant.width,Constant.height-100);
         stage.addActor(content);
         Image back = new Image(new Texture("back.png"));
-        stage.addActor(back);
         back.setName("back");
         back.setPosition(20,Constant.height - 31,Align.topLeft);
+        stage.addActor(back);
         Label title = new Label("double game",new Label.LabelStyle(){{font = FontResource.commonfont; }});
-        stage.addActor(title);
         title.setAlignment(Align.center);
         title.setPosition(head.getWidth()/2,head.getY(Align.center), Align.center);
+        stage.addActor(title);
         Image daojishi = new Image(new Texture("daojishi.png"));
         daojishi.setPosition(20,Constant.height-112, Align.topLeft);
         daojishi.setOrigin(Align.center);
@@ -45,21 +55,13 @@ public class DScreen extends BaseScreen {
         stage.addActor(timeLabel);
         timeLabel.setName("time");
         timeLabel.setPosition(daojishi.getX(Align.right)+5,daojishi.getY(Align.center),Align.left);
-        Label currentPlayer = new Label(data.getCurrentPlay() ,new Label.LabelStyle(){{font = FontResource.commonfont; }});
-        stage.addActor(currentPlayer);
+        currentPlayer = new Label(data.getCurrentPlay() ,new Label.LabelStyle(){{font = FontResource.commonfont; }});
         currentPlayer.setAlignment(Align.center);
         currentPlayer.setPosition(Constant.width/2,timeLabel.getY(Align.center),Align.center);
+        stage.addActor(currentPlayer);
         GamePanel panel = new GamePanel(data);
-        stage.addActor(panel);
         panel.setPosition(Constant.width/2,Constant.height*0.42F,Align.center);
-        panel.setListener(new GamePanel.Listener() {
-            @Override
-            public void updatePlayer(Player currentPlay) {
-                System.out.println(currentPlay.name);
-                currentPlayer.setText(currentPlay.name);
-                currentPlayer.setColor(currentPlay.color);
-            }
-        });
+        stage.addActor(panel);
     }
 
     @Override
@@ -71,23 +73,28 @@ public class DScreen extends BaseScreen {
                 enterScreen(new MainScreen());
             }
         });
+        GamePanel gamePanel = findActor("gamePanel");
+        gamePanel.setListener((currentPlay)-> { updatePlayer(currentPlay);});
     }
 
-    @Override
-    protected void initData() {
-        data = new GameData();
-    }
-
-    private float time = 0;
-    private int current = 0;
     @Override
     public void render(float delta) {
         super.render(delta);
-        time += delta;
+        updateTime(delta);
+    }
+
+    private void updateTime(float delta){
+        float deltaTemp = delta;
+        time += deltaTemp;
         if (time>=1){
             time = 0;
             current++;
             timeLabel.setText(current);
         }
+    }
+
+    private void updatePlayer(Player currentPlay){
+        currentPlayer.setText(currentPlay.name);
+        currentPlayer.setColor(currentPlay.color);
     }
 }

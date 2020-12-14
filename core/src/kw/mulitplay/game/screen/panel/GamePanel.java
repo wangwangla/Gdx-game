@@ -1,7 +1,6 @@
 package kw.mulitplay.game.screen.panel;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import java.util.ArrayDeque;
@@ -10,7 +9,6 @@ import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.actor.PackActor;
 import kw.mulitplay.game.screen.Player;
 import kw.mulitplay.game.screen.data.GameData;
-import sun.util.resources.cldr.ki.LocaleNames_ki;
 
 public class GamePanel extends Group {
     private PackActor up = new PackActor();
@@ -29,11 +27,18 @@ public class GamePanel extends Group {
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
     public GamePanel(GameData data){
         this.data = data;
+        setName("gamePanel");
+        initData();   //准备数据
         initPlayer(); // 初始化玩家
         initTable();  //初始化格子
         initPacker();  //初始化牌
         initTip();  // 初始化提示框
         controller(); //添加控制
+    }
+
+    private void initData() {
+        arr = data.shuffle();
+//        ---->>>>>  发送消息
     }
 
     private void initTip() {
@@ -44,11 +49,9 @@ public class GamePanel extends Group {
     }
 
     private void initPacker() {
-        arr = data.shuffle();
-        for (int i = 0; i < arr.length; i++) {
-            for (int i1 = 0; i1 < arr[0].length; i1++) {
-                PackActor actor = new PackActor(data,arr[i][i1]);
-                actor.setXY(i,i1);
+        for (int x = 0; x < arr.length; x++) {
+            for (int y = 0; y < arr[0].length; y++) {
+                PackActor actor = new PackActor(data,x,y);
                 actor.setListener(listener);
                 addActor(actor);
             }
@@ -75,20 +78,20 @@ public class GamePanel extends Group {
         right.setListener(NullListener);
     }
 
-
     public PackActor.TachListener NullListener = new PackActor.TachListener(){
         @Override
         public void action(PackActor target) {
+//            ----->>>>> 发送消息
+
+
             move(target);
-            packActors.clear();
-            resetTip();
         }
     };
 
     private void move(PackActor target) {
         if (target.isVisible()) {
             changePosition(target);
-            changePlayer();
+            resetTip(true);
         }
     }
 
@@ -102,6 +105,7 @@ public class GamePanel extends Group {
         last.setXY(tempX,tempY);
         last.setAnimalScale(1);
         target.setVisible(false);
+        changePlayer();
     }
 
     public void changePlayer(){
@@ -116,7 +120,10 @@ public class GamePanel extends Group {
     public PackActor.TachListener listener = new PackActor.TachListener(){
         @Override
         public void action(PackActor target) {
-            resetTip();
+            //发送消息    ---->>>>
+
+
+            resetTip(false);
             if (target.getCurrentStatus() == Constant.FANMIAN){
                 fanPacker(target);
             }else {
@@ -181,8 +188,7 @@ public class GamePanel extends Group {
                     arr[targetX][targetY] = arr[lastX][lastY];
                     arr[lastX][lastY] = 0;
                     last.setAnimalScale(1);
-                    packActors.clear();
-                    resetTip();
+                    resetTip(true);
                     changePlayer();
                     return;
                 }
@@ -222,7 +228,8 @@ public class GamePanel extends Group {
         return false;
     }
 
-    private void resetTip(){
+    private void resetTip(boolean isClear){
+        if (isClear)  packActors.clear();
         up.setVisible(false);
         down.setVisible(false);
         left.setVisible(false);

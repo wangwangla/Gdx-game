@@ -6,15 +6,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.asset.FontResource;
+import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
 
 public class LoadingScreen extends BaseScreen {
+
+    private boolean out;
+    private float time;
 
     @Override
     protected void initView() {
         Image image = new Image(new Texture("splash.png"));
         stage.addActor(image);
         new FontResource();
+        Constant.resource = new Resource();
     }
 
     @Override
@@ -30,14 +35,11 @@ public class LoadingScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
-        if (out)return;
         enterNextScreen(delta);
     }
 
-    private boolean out;
-    private float time;
-
     public void enterNextScreen(float delta){
+        if (out)return;
         time +=  delta;
         if (time>2){
             out = true;

@@ -22,7 +22,6 @@ public class MainScreen extends BaseScreen {
         Image button = new Image(new Texture("doubleduiyi.png"));
         stage.addActor(button);
         button.setPosition(Constant.width/2,Constant.height/2, Align.center);
-        System.out.println(button.getWidth()+"=="+Constant.width);
         button.setName("button");
     }
 
@@ -35,7 +34,6 @@ public class MainScreen extends BaseScreen {
                 Constant.game.setScreen(new DScreen());
             }
         });
-
     }
 
     @Override

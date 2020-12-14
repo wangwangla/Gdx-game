@@ -34,8 +34,8 @@ public class PackActor extends Group {
         setVisible(false);
     }
 
-    public PackActor(GameData data, Integer num){
-        name = num+"";
+    public PackActor(GameData data, int x, int y){
+        name = data.getArr()+"";
         setName(name);
         currentStatus = Constant.FANMIAN;
         useColor = blackColor;
@@ -62,6 +62,7 @@ public class PackActor extends Group {
         animalLabel.setAlignment(Align.center);
         animalLabel.setPosition(20,getHeight()-20, Align.center);
         addActor(fanPack);
+        setXY(x,y);
     }
 
     public int getTempX() {

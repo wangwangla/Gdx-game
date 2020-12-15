@@ -36,6 +36,7 @@ public class MultClient {
                 if (object instanceof Message) {
                     System.out.println("client message:"+((Message)object).toString());
                     listener.action((Message)object);
+
                 }
             }
 

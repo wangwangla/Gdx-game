@@ -4,6 +4,9 @@ public class VectorPosition {
     private int x;
     private int y;
 
+    public VectorPosition() {
+    }
+
     public VectorPosition(int x, int y) {
         this.x = x;
         this.y = y;

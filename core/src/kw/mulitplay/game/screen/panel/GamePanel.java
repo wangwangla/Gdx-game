@@ -61,9 +61,9 @@ public class GamePanel extends Group {
                     Message arrMessage = new Message(arr);
                     Constant.multServer.setListener(new NetListener(){
                         @Override
-                        public Message excute(Message message) {
+                        public Message action(Message message) {
                             runNetMethod(message);
-                            return super.excute(message);
+                            return super.action(message);
                         }
                     });
                     return arrMessage;
@@ -97,9 +97,9 @@ public class GamePanel extends Group {
         other();
         Constant.multClient.setListener(new NetListener(){
             @Override
-            public Message excute(Message message) {
+            public Message action(Message message) {
                 runNetMethod(message);
-                return super.excute(message);
+                return super.action(message);
             }
         });
     }

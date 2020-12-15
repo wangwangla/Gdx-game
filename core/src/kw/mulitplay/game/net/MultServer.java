@@ -35,7 +35,7 @@ public class MultServer{
                 super.received(connection, object);
                 if (object instanceof Message) {
                     VectorPosition position = ((Message) object).getPosition();
-                    System.out.println("received"+position.getX()+"==="+position.getY());
+                    System.out.println("sever received"+position.getX()+"==="+position.getY());
                 }
             }
 
@@ -54,6 +54,7 @@ public class MultServer{
             }
         });
     }
+
 
     public void sendMessage(Message action){
         for (Connection connection : array) {

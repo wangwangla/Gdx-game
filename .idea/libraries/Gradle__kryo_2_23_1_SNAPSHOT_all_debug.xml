@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/core/libs/kryo-2.23.1-SNAPSHOT-all-debug.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

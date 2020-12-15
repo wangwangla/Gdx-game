@@ -1,0 +1,10 @@
+## Java
+
+./gradle
+.*
+
+
+app/build
+core/build
+
+desktop/build

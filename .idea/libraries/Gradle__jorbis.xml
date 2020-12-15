@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: jorbis">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/gdx-backend-lwjgl/libs/jorbis.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

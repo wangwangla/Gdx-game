@@ -1,10 +1,12 @@
 package kw.mulitplay.game.screen.panel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 
+import java.sql.Connection;
 import java.util.ArrayDeque;
 
 import kw.mulitplay.game.Message;
@@ -57,6 +59,13 @@ public class GamePanel extends Group {
                 @Override
                 public Message action(Message message) {
                     Message arrMessage = new Message(arr);
+                    Constant.multServer.setListener(new NetListener(){
+                        @Override
+                        public Message excute(Message message) {
+                            runNetMethod(message);
+                            return super.excute(message);
+                        }
+                    });
                     return arrMessage;
                 }
             });
@@ -81,11 +90,30 @@ public class GamePanel extends Group {
 
     }
 
-    Thread thread;
+
     public void run(Message message){
         arr = message.getArr();
         data.setArr(arr);
         other();
+        Constant.multClient.setListener(new NetListener(){
+            @Override
+            public Message excute(Message message) {
+                runNetMethod(message);
+                return super.excute(message);
+            }
+        });
+    }
+
+    private void runNetMethod(Message message){
+        String name = message.getName();
+        PackActor actor = findActor(name);
+
+        if (message.getType().equals("")){
+            //得到  target
+            move(actor);
+        }else {
+            GamePanel.this.excute(actor);
+        }
     }
 
     private void initTip() {
@@ -129,18 +157,22 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
 //            ----->>>>> 发送消息
-            if (Constant.isServer == Constant.SERVER){
-                Message message = new Message();
-                message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
-                Constant.multServer.sendMessage(message);
-            }else {
-                Message message = new Message();
-                message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
-                Constant.multClient.senMessage(message);
-            }
+            sendMessage(target);
             move(target);
         }
     };
+
+    private void sendMessage(PackActor target){
+        Message message = new Message();
+        message.setType("NULLTYPE");
+        message.setName(target.getName());
+        message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+        if (Constant.isServer == Constant.SERVER){
+            Constant.multServer.sendMessage(message);
+        }else {
+            Constant.multClient.senMessage(message);
+        }
+    }
 
     private void move(PackActor target) {
         if (target.isVisible()) {
@@ -175,106 +207,107 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
             //发送消息    ---->>>>
-//
-//            Message message = new Message();
-//            message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
-//            Constant.multClient.senMessage(message);
-
-            resetTip(false);
-            if (target.getCurrentStatus() == Constant.FANMIAN){
-                fanPacker(target);
-            }else {
-                //如果已經有選中的
-                if (packActors.size()!=0){
-                    alreadySelected(target);
-                }else {
-                    if (currentPlay.OWNER != target.getOwer())return;
-                    packActors.add(target);
-                    target.setAnimalScale(1.1F);
-                }
-                //提示
-                 tip();
-            }
+            sendMessage(target);
+            excute(target);
         }
 
-        private void tip() {
-            if (packActors.size() == 0) {
-                return;
-            }
-            PackActor last = packActors.getLast();
-            int tempX = last.getTempX();
-            int tempY = last.getTempY();
-            if (tempX+1<4){
-                if (arr[tempX + 1][tempY] == 0) {
-                    right.setXY(tempX+1,tempY);
-                    right.setVisible(true);
-                }
-            }
-            if (tempX-1>=0){
-                if (arr[tempX-1][tempY] == 0) {
-                    left.setXY(tempX-1,tempY);
-                    left.setVisible(true);
-                }
-            }
-            if (tempY + 1<5){
-                if (arr[tempX][tempY+1] == 0) {
-                    up.setXY(tempX,tempY+1);
-                    up.setVisible(true);
-                }
-            }
-            if (tempY - 1>=0){
-                if (arr[tempX][tempY-1] == 0) {
-                    down.setXY(tempX,tempY-1);
-                    down.setVisible(true);
-                }
-            }
-        }
 
-        private void alreadySelected(PackActor target) {
-            PackActor last = packActors.getLast();
-            int lastX = last.getTempX();
-            int lastY = last.getTempY();
-            int targetX = target.getTempX();
-            int targetY = target.getTempY();
-            if(last.getOwer()!=target.getOwer()&&isValue(lastX,lastY,targetX,targetY)){
-                //是否可以吃掉對方
-                int num = target.getNum();
-                if ((last.getNum() == 10&&num==1)||num>=last.getNum()){
-                    target.appear();
-                    last.setXY(targetX,targetY);
-                    arr[targetX][targetY] = arr[lastX][lastY];
-                    arr[lastX][lastY] = 0;
-                    last.setAnimalScale(1);
-                    resetTip(true);
-                    changePlayer();
-                    return;
-                }
-                //否則   將本次的加進去
-            }
-            last.setAnimalScale(1);
-            if (currentPlay.OWNER != target.getOwer())return;
-            packActors.add(target);
-            target.setAnimalScale(1.1F);
-        }
-
-        private void fanPacker(PackActor target) {
-            target.open();
-            // 默認playA是第一個節拍的
-            if (A.OWNER == -1) {
-                A.OWNER = target.getOwer();
-                A.color = target.getUseColor();
-                B.OWNER = (short) (1-target.getOwer());
-                B.color = target.getOtherColor();
-            }
-            changePlayer();
-            if (packActors.size()!=0){
-                PackActor last = packActors.getLast();
-                last.setAnimalScale(1);
-                packActors.clear();
-            }
+    };
+    private void tip() {
+        if (packActors.size() == 0) {
             return;
         }
-    };
+        PackActor last = packActors.getLast();
+        int tempX = last.getTempX();
+        int tempY = last.getTempY();
+        if (tempX+1<4){
+            if (arr[tempX + 1][tempY] == 0) {
+                right.setXY(tempX+1,tempY);
+                right.setVisible(true);
+            }
+        }
+        if (tempX-1>=0){
+            if (arr[tempX-1][tempY] == 0) {
+                left.setXY(tempX-1,tempY);
+                left.setVisible(true);
+            }
+        }
+        if (tempY + 1<5){
+            if (arr[tempX][tempY+1] == 0) {
+                up.setXY(tempX,tempY+1);
+                up.setVisible(true);
+            }
+        }
+        if (tempY - 1>=0){
+            if (arr[tempX][tempY-1] == 0) {
+                down.setXY(tempX,tempY-1);
+                down.setVisible(true);
+            }
+        }
+    }
+
+    private void alreadySelected(PackActor target) {
+        PackActor last = packActors.getLast();
+        int lastX = last.getTempX();
+        int lastY = last.getTempY();
+        int targetX = target.getTempX();
+        int targetY = target.getTempY();
+        if(last.getOwer()!=target.getOwer()&&isValue(lastX,lastY,targetX,targetY)){
+            //是否可以吃掉對方
+            int num = target.getNum();
+            if ((last.getNum() == 10&&num==1)||num>=last.getNum()){
+                target.appear();
+                last.setXY(targetX,targetY);
+                arr[targetX][targetY] = arr[lastX][lastY];
+                arr[lastX][lastY] = 0;
+                last.setAnimalScale(1);
+                resetTip(true);
+                changePlayer();
+                return;
+            }
+            //否則   將本次的加進去
+        }
+        last.setAnimalScale(1);
+        if (currentPlay.OWNER != target.getOwer())return;
+        packActors.add(target);
+        target.setAnimalScale(1.1F);
+    }
+
+    private void excute(PackActor target) {
+        resetTip(false);
+        if (target.getCurrentStatus() == Constant.FANMIAN){
+            fanPacker(target);
+        }else {
+            //如果已經有選中的
+            if (packActors.size()!=0){
+                alreadySelected(target);
+            }else {
+                if (currentPlay.OWNER != target.getOwer())return;
+                packActors.add(target);
+                target.setAnimalScale(1.1F);
+            }
+            //提示
+            tip();
+        }
+    }
+
+    private void fanPacker(PackActor target) {
+        target.open();
+        // 默認playA是第一個節拍的
+        if (A.OWNER == -1) {
+            A.OWNER = target.getOwer();
+            A.color = target.getUseColor();
+            B.OWNER = (short) (1-target.getOwer());
+            B.color = target.getOtherColor();
+        }
+        changePlayer();
+        if (packActors.size()!=0){
+            PackActor last = packActors.getLast();
+            last.setAnimalScale(1);
+            packActors.clear();
+        }
+        return;
+    }
 
     private boolean isValue(int x,int y,int targetX,int targetY){
         if ((x+1==targetX)&&(y == targetY) ||

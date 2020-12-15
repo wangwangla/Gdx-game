@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: lwjgl">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/gdx-backend-lwjgl/libs/lwjgl.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

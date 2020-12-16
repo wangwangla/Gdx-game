@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align;
 
 import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.asset.FontResource;
+import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.data.GameData;
 
 public class PackActor extends Group {
@@ -29,7 +30,7 @@ public class PackActor extends Group {
     private short ower;
     public PackActor(){
         setSize(160,185);
-        Image image = new Image(new Texture("white.png"));
+        Image image = new Image(Resource.atlas.findRegion("white"));
         addActor(image);
         setVisible(false);
     }
@@ -48,18 +49,17 @@ public class PackActor extends Group {
         }
         this.num = i;
         if (num == 0){
-            System.out.println(x+"============"+y);
             for (int[] ints : data.getArr()) {
 
             }
         }
-        bg = new Image(new Texture("white.png"));
+        bg = new Image(Resource.atlas.findRegion("white"));
         addActor(bg);
-        fanPack = new Image(new Texture("pckback.png"));
+        fanPack = new Image(Resource.atlas.findRegion("pckback"));
         setSize(fanPack.getWidth(),fanPack.getHeight());
         bg.setSize(getWidth(),getHeight());
         fanPack.setPosition(getWidth()/2,getHeight()/2, Align.center);
-        zhengPack = new Image(new Texture("animal/"+num+".png"));
+        zhengPack = new Image(Resource.atlas.findRegion(num+""));
         addActor(zhengPack);
         zhengPack.setPosition(getWidth(),0,Align.bottomRight);
         name = data.getAnimalData().get(num);

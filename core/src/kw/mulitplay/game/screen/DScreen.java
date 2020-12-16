@@ -2,6 +2,7 @@ package kw.mulitplay.game.screen;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.utils.Align;
 
 import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.asset.FontResource;
+import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
 import kw.mulitplay.game.screen.data.GameData;
 import kw.mulitplay.game.screen.panel.GamePanel;
@@ -20,6 +22,7 @@ public class DScreen extends BaseScreen {
     private float time = 0;
     private int current = 0;
     private Label currentPlayer;
+    private GamePanel panel;
 
     @Override
     protected void initData() {
@@ -28,16 +31,16 @@ public class DScreen extends BaseScreen {
 
     @Override
     protected void initView() {
-        Image head = new Image(new Texture("white.png"));
+        Image head = new Image(Resource.atlas.findRegion("white"));
         head.setColor(Color.valueOf("a6937c"));
         head.setSize(Constant.width,100);
         head.setY(Constant.height, Align.top);
         stage.addActor(head);
-        Image content = new Image(new Texture("white.png"));
+        Image content = new Image(Resource.atlas.findRegion("white"));
         content.setColor(Color.valueOf("d1c0a5"));
         content.setSize(Constant.width,Constant.height-100);
         stage.addActor(content);
-        Image back = new Image(new Texture("back.png"));
+        Image back = new Image(Resource.atlas.findRegion("back"));
         back.setName("back");
         back.setPosition(20,Constant.height - 31,Align.topLeft);
         stage.addActor(back);
@@ -45,7 +48,7 @@ public class DScreen extends BaseScreen {
         title.setAlignment(Align.center);
         title.setPosition(head.getWidth()/2,head.getY(Align.center), Align.center);
         stage.addActor(title);
-        Image daojishi = new Image(new Texture("daojishi.png"));
+        Image daojishi = new Image(Resource.atlas.findRegion("daojishi"));
         daojishi.setPosition(20,Constant.height-112, Align.topLeft);
         daojishi.setOrigin(Align.center);
         daojishi.setScale(0.7F);
@@ -63,10 +66,16 @@ public class DScreen extends BaseScreen {
     }
 
     private void startGame(){
-        timeLabel.setText("0");
-        GamePanel panel = new GamePanel(data);
+        current = 0;
+        timeLabel.setText(current+"");
+        Actor gamePanel = findActor("gamePanel");
+        if (gamePanel != null) {
+            gamePanel.remove();
+        }
+        panel = new GamePanel(data);
         panel.setPosition(Constant.width/2,Constant.height*0.42F,Align.center);
         stage.addActor(panel);
+        addGamePanelListener();
     }
 
     @Override
@@ -78,8 +87,21 @@ public class DScreen extends BaseScreen {
                 enterScreen(new MainScreen());
             }
         });
+    }
+
+    private void addGamePanelListener() {
         GamePanel gamePanel = findActor("gamePanel");
-        gamePanel.setListener((currentPlay)-> { updatePlayer(currentPlay);});
+        gamePanel.setListener(new GamePanel.Listener() {
+            @Override
+            public void updatePlayer(Player currentPlay) {
+                DScreen.this.updatePlayer(currentPlay);
+            }
+
+            @Override
+            public void rePlay() {
+                startGame();
+            }
+        });
     }
 
     @Override
@@ -89,6 +111,7 @@ public class DScreen extends BaseScreen {
     }
 
     private void updateTime(float delta){
+        if (panel.getStatus() != GamePanel.GameStatus.running)return;
         float deltaTemp = delta;
         time += deltaTemp;
         if (time>=1){

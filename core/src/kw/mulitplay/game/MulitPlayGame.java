@@ -2,6 +2,7 @@ package kw.mulitplay.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.CpuSpriteBatch;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -20,8 +21,9 @@ public class MulitPlayGame extends Game {
         //create batch
         Constant.batch = new CpuSpriteBatch();
         //loading
-        setScreen(new LoadingScreen());
         Constant.game = this;
+        Constant.assetManager = new AssetManager();
+        setScreen(new LoadingScreen());
     }
 
     @Override

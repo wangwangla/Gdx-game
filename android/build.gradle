@@ -20,19 +20,15 @@ android {
         targetCompatibility = '1.8'
     }
     
-        lintOptions {
-            checkReleaseBuilds false
-            abortOnError false
-        }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 
     packagingOptions {
         exclude 'META-INF/robovm/ios/robovm.xml'
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/INDEX.LIST'
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
@@ -42,6 +38,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false

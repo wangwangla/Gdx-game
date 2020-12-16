@@ -10,6 +10,7 @@ import kw.mulitplay.game.MulitPlayGame;
 
 public class DesktopLauncher {
     public static void main(String[] arg) {
+//        texturePack();
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.title = "wrod squares";
         config.width =460; //485
@@ -43,10 +44,7 @@ public class DesktopLauncher {
         TexturePacker.process(setting, "../../Assets/spine/" + srcDir + "/", "../../Assets/atlas/", srcDir);
     }
 
-
     private static void processAndroid(TexturePacker.Settings setting) {
-//        File file = new File("");
-//        File dstFile = new File(new File(file.getAbsolutePath()).getParentFile().getParentFile().getAbsolutePath() + "/Assets/pic/");
         for (int i = 0; i < atlasFileName.length; i++) {
             String input = atlasFileName[i];
             if (input == null) return;
@@ -56,35 +54,9 @@ public class DesktopLauncher {
                         "../../Assets/" + input + "/",
                         "image/" ,
                         input);
-
-
-//                TexturePacker.process(setting, "desktop/pic/", "desktop/", input);
-                //  TexturePacker.process(setting, dstFile.getAbsolutePath() + "/" + input + "/", "desktop/", input);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-//        for (int i = 0; i < array.size; i++) {
-//            String input = array.get(i);
-//            if (input == null) return;
-//            try {
-//                TexturePacker.process(
-//                        setting,
-//                        "../../Assets/" + input + "/",
-//                        "themes/"+input ,
-//                        input);
-//
-//
-////                TexturePacker.process(setting, "desktop/pic/", "desktop/", input);
-//                //  TexturePacker.process(setting, dstFile.getAbsolutePath() + "/" + input + "/", "desktop/", input);
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
-
-
 }

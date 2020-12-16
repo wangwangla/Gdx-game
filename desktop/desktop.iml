@@ -41,6 +41,5 @@
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: kryonet-9-7-14" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: objenesis-2.1" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: desktop.desktop-1.0" level="project" />
   </component>
 </module>

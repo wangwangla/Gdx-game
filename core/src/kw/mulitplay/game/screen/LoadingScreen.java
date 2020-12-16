@@ -1,5 +1,6 @@
 package kw.mulitplay.game.screen;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
@@ -12,13 +13,14 @@ import kw.mulitplay.game.screen.base.BaseScreen;
  * all screen extends BaseScreen
  */
 public class LoadingScreen extends BaseScreen {
-
+    private AssetManager assetManager;
     private boolean out;
     private float time;
 
     @Override
     protected void initView() {
-        Image image = new Image(new Texture("splash.png"));
+        assetManager = Constant.assetManager;
+        Image image = new Image(new Texture("splash.webp"));
         stage.addActor(image);
         image.setOrigin(Align.center);
         image.setScale(Constant.bgScale);
@@ -26,6 +28,7 @@ public class LoadingScreen extends BaseScreen {
         //init font resource
         //init resource
         Constant.resource = new Resource();
+        Constant.resource.getAtlas();
     }
 
     @Override
@@ -46,8 +49,7 @@ public class LoadingScreen extends BaseScreen {
 
     public void enterNextScreen(float delta){
         if (out)return;
-        time +=  delta;
-        if (time>2){
+        if (assetManager.update()){
             out = true;
             enterScreen(new MainScreen());
         }

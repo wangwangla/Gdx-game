@@ -1,6 +1,7 @@
 package kw.mulitplay.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -26,4 +27,5 @@ public class Constant {
     public static MultServer multServer;
 
     public static float bgScale = 1;
+    public static AssetManager assetManager;
 }

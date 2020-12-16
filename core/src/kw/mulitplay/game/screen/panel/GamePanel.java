@@ -3,8 +3,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
@@ -14,6 +16,7 @@ import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.Message;
 import kw.mulitplay.game.actor.PackActor;
 import kw.mulitplay.game.asset.FontResource;
+import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.net.MultClient;
 import kw.mulitplay.game.net.MultServer;
 import kw.mulitplay.game.net.NetListener;
@@ -142,7 +145,7 @@ public class GamePanel extends Group {
     }
 
     private void initTable() {
-        Image table = new Image(new Texture("table.png"));
+        Image table = new Image(Resource.atlas.findRegion("table"));
         addActor(table);
         table.setPosition(-4,-4);
         setSize(table.getWidth(),table.getHeight());
@@ -305,24 +308,48 @@ public class GamePanel extends Group {
             System.out.println("red win !!!");
             showPassLevel("red win");
         }
-        showPassLevel("red win");
+    }
+
+    public enum GameStatus{
+        running,win
+    }
+
+    private GameStatus status = GameStatus.running;
+
+    public GameStatus getStatus() {
+        return status;
     }
 
     public void showPassLevel(String text){
+        status = GameStatus.win;
         Group group = new Group();
         group.setSize(Constant.width,Constant.height);
         group.setPosition(Constant.width/2,Constant.height/2,Align.center);
         getStage().addActor(group);
-        Image sha = new Image(new Texture("white.png"));
+        Image sha = new Image(Resource.atlas.findRegion("white"));
         group.addActor(sha);
         sha.setSize(group.getWidth(),group.getHeight());
-        sha.setColor(Color.valueOf("77777744"));
+        sha.setColor(Color.valueOf("44444477"));
         Label textLabel = new Label(text,new Label.LabelStyle(){{font = FontResource.commonfont;}});
         group.addActor(textLabel);
         textLabel.setAlignment(Align.center);
+        textLabel.setScale(2);
         textLabel.setPosition(Constant.width/2,Constant.height/2, Align.center);
 
+        Label clickLabel = new Label("Click any key enter new Game",new Label.LabelStyle(){{font = FontResource.commonfont;}});
+        group.addActor(clickLabel);
+        clickLabel.setAlignment(Align.center);
+        clickLabel.setPosition(Constant.width/2,Constant.height*0.3F, Align.center);
         //点击任意就重新开始
+        group.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                group.remove();
+                updateListener.rePlay();
+                removeListener(this);
+            }
+        });
 
     }
 
@@ -387,7 +414,6 @@ public class GamePanel extends Group {
 
     public interface Listener{
         void updatePlayer(Player currentPlay);
+        void rePlay();
     }
-
-
 }

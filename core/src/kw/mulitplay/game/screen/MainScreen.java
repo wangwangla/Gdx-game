@@ -12,21 +12,22 @@ import com.badlogic.gdx.utils.Align;
 
 import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.asset.FontResource;
+import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
 
 public class MainScreen extends BaseScreen {
     @Override
     protected void initView() {
-        Image image  = new Image(new Texture("mainbg.png"));
+        Image image  = new Image(Resource.atlas.findRegion("mainbg"));
         stage.addActor(image);
         image.setOrigin(Align.center);
         image.setScale(Constant.bgScale);
         image.setY(Constant.height/2,Align.center);
-        Image button = new Image(new Texture("doubleduiyi.png"));
+        Image button = new Image(Resource.atlas.findRegion("doubleduiyi"));
         stage.addActor(button);
         button.setPosition(Constant.width/2,Constant.height/2, Align.center);
         button.setName("button");
-        Image button2 = new Image(new Texture("doubleduiyi.png"));
+        Image button2 = new Image(Resource.atlas.findRegion("doubleduiyi"));
         stage.addActor(button2);
         button2.setPosition(Constant.width/2,Constant.height/2-150, Align.center);
         button2.setName("button2");
@@ -57,7 +58,7 @@ public class MainScreen extends BaseScreen {
 
     private void tip(){
         Group tipGroup = new Group();
-        Image tipMessage = new Image(new Texture("white.png"));
+        Image tipMessage = new Image(Resource.atlas.findRegion("white"));
         tipMessage.setSize(Constant.width,100);
         tipGroup.setSize(tipMessage.getWidth(),tipMessage.getHeight());
         tipGroup.addActor(tipMessage);

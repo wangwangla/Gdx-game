@@ -1,13 +1,20 @@
 package kw.mulitplay.game.asset;
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import java.util.HashMap;
+
+import kw.mulitplay.game.Constant;
 
 public class Resource {
 
+    public static TextureAtlas atlas;
     public HashMap<String, Integer> hashMap;
     public HashMap<Integer,String> animalData;
+    public FontResource fontResource;
     public Resource() {
-        new FontResource();
+        fontResource = new FontResource();
+        Constant.assetManager.load("image/main.atlas",TextureAtlas.class);
         hashMap = new HashMap();
         hashMap.put("象", 1);
         hashMap.put("狮", 2);
@@ -32,4 +39,8 @@ public class Resource {
         animalData.put(10, "鼠");
     }
 
+    public void getAtlas(){
+        fontResource.getAtlas();
+        atlas = Constant.assetManager.get("image/main.atlas");
+    }
 }

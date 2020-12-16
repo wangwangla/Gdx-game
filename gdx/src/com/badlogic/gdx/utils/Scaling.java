@@ -41,7 +41,7 @@ public enum Scaling {
 	/** Scales the source to fill the target in the y direction, without changing the x direction. This may cause the source to not
 	 * keep the same aspect ratio. */
 	stretchY,
-	/** The source is not scaled. */
+	/** The sou is not scaled. */
 	none;
 
 	static private final Vector2 temp = new Vector2();

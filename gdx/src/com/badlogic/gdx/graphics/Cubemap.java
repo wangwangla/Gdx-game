@@ -152,7 +152,6 @@ public class Cubemap extends GLTexture {
 		bind();
 		unsafeSetFilter(minFilter, magFilter, true);
 		unsafeSetWrap(uWrap, vWrap, true);
-		unsafeSetAnisotropicFilter(anisotropicFilterLevel, true);
 		data.consumeCubemapData();
 		Gdx.gl.glBindTexture(glTarget, 0);
 	}

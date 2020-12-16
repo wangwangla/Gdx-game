@@ -1,22 +1,18 @@
 package kw.mulitplay.game.screen.panel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 
-import java.sql.Connection;
 import java.util.ArrayDeque;
 
-import kw.mulitplay.game.Message;
 import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.Message;
 import kw.mulitplay.game.actor.PackActor;
 import kw.mulitplay.game.net.MultClient;
 import kw.mulitplay.game.net.MultServer;
 import kw.mulitplay.game.net.NetListener;
 import kw.mulitplay.game.position.VectorPosition;
-import kw.mulitplay.game.screen.DScreen;
 import kw.mulitplay.game.screen.Player;
 import kw.mulitplay.game.screen.data.GameData;
 
@@ -71,7 +67,9 @@ public class GamePanel extends Group {
             });
             other();
         }else if (Constant.isServer == Constant.CLIENT){
-            MultClient client = new MultClient("127.0.0.1");
+            System.out.println();
+
+            MultClient client = new MultClient();
             Constant.multClient =client;
             client.setListener(new NetListener() {
                 @Override
@@ -157,7 +155,9 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
 //            ----->>>>> 发送消息
-            sendMessage(target);
+            if (Constant.isServer != Constant.NOMAL) {
+                sendMessage(target);
+            }
             move(target);
         }
     };
@@ -207,11 +207,11 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
             //发送消息    ---->>>>
-            sendMessage(target);
+            if (Constant.isServer != Constant.NOMAL){
+                sendMessage(target);
+            }
             excute(target);
         }
-
-
     };
     private void tip() {
         if (packActors.size() == 0) {

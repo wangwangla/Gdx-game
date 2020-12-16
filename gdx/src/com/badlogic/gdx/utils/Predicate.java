@@ -18,6 +18,8 @@ package com.badlogic.gdx.utils;
 
 import java.util.Iterator;
 
+import com.badlogic.gdx.utils.Array.ArrayIterator;
+
 /** Interface used to select items within an iterator against a predicate.
  * @author Xoppa */
 public interface Predicate<T> {
@@ -97,13 +99,10 @@ public interface Predicate<T> {
 			this.predicate = predicate;
 		}
 
-		/** Returns an iterator. Remove is supported.
-		 * <p>
-		 * If {@link Collections#allocateIterators} is false, the same iterator instance is returned each time this method is called. Use
-		 * the {@link Predicate.PredicateIterator} constructor for nested or multithreaded iteration. */
+		/** Returns an iterator. Note that the same iterator instance is returned each time this method is called. Use the
+		 * {@link Predicate.PredicateIterator} constructor for nested or multithreaded iteration. */
 		@Override
 		public Iterator<T> iterator () {
-			if (Collections.allocateIterators) return new PredicateIterator<T>(iterable.iterator(), predicate);
 			if (iterator == null)
 				iterator = new PredicateIterator<T>(iterable.iterator(), predicate);
 			else

@@ -132,7 +132,7 @@ public class DistanceFieldFont extends BitmapFont {
 			+ "}\n";
 
 		ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
-		if (!shader.isCompiled())
+		if (shader.isCompiled() == false)
 			throw new IllegalArgumentException("Error compiling distance field shader: " + shader.getLog());
 		return shader;
 	}

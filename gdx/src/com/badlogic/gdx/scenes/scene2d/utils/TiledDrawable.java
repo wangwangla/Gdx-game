@@ -25,7 +25,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  * @author Nathan Sweet */
 public class TiledDrawable extends TextureRegionDrawable {
 	private final Color color = new Color(1, 1, 1, 1);
-	private float scale = 1;
 
 	public TiledDrawable () {
 		super();
@@ -40,11 +39,11 @@ public class TiledDrawable extends TextureRegionDrawable {
 	}
 
 	public void draw (Batch batch, float x, float y, float width, float height) {
-		float oldColor = batch.getPackedColor();
-		batch.getColor().mul(color);
+		float batchColor = batch.getPackedColor();
+		batch.setColor(batch.getColor().mul(color));
 
 		TextureRegion region = getRegion();
-		float regionWidth = region.getRegionWidth() * scale, regionHeight = region.getRegionHeight() * scale;
+		float regionWidth = region.getRegionWidth(), regionHeight = region.getRegionHeight();
 		int fullX = (int)(width / regionWidth), fullY = (int)(height / regionHeight);
 		float remainingX = width - regionWidth * fullX, remainingY = height - regionHeight * fullY;
 		float startX = x, startY = y;
@@ -62,7 +61,7 @@ public class TiledDrawable extends TextureRegionDrawable {
 		float v2 = region.getV2();
 		if (remainingX > 0) {
 			// Right edge.
-			float u2 = u + remainingX / (texture.getWidth() * scale);
+			float u2 = u + remainingX / texture.getWidth();
 			float v = region.getV();
 			y = startY;
 			for (int ii = 0; ii < fullY; ii++) {
@@ -71,14 +70,14 @@ public class TiledDrawable extends TextureRegionDrawable {
 			}
 			// Upper right corner.
 			if (remainingY > 0) {
-				v = v2 - remainingY / (texture.getHeight() * scale);
+				v = v2 - remainingY / texture.getHeight();
 				batch.draw(texture, x, y, remainingX, remainingY, u, v2, u2, v);
 			}
 		}
 		if (remainingY > 0) {
 			// Top edge.
 			float u2 = region.getU2();
-			float v = v2 - remainingY / (texture.getHeight() * scale);
+			float v = v2 - remainingY / texture.getHeight();
 			x = startX;
 			for (int i = 0; i < fullX; i++) {
 				batch.draw(texture, x, y, regionWidth, remainingY, u, v2, u2, v);
@@ -86,7 +85,7 @@ public class TiledDrawable extends TextureRegionDrawable {
 			}
 		}
 
-		batch.setPackedColor(oldColor);
+		batch.setColor(batchColor);
 	}
 
 	public void draw (Batch batch, float x, float y, float originX, float originY, float width, float height, float scaleX,
@@ -96,14 +95,6 @@ public class TiledDrawable extends TextureRegionDrawable {
 
 	public Color getColor () {
 		return color;
-	}
-
-	public void setScale (float scale) {
-		this.scale = scale;
-	}
-
-	public float getScale () {
-		return scale;
 	}
 
 	public TiledDrawable tint (Color tint) {

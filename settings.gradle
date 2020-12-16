@@ -1,1 +1,1 @@
-include  'desktop', 'core','gdx','gdx-backend-lwjgl','app'
+include "core", "desktop", "android",'gdx'

@@ -24,6 +24,8 @@ import com.badlogic.gdx.LifecycleListener;
 /** Executes tasks in the future on the main loop thread.
  * @author Nathan Sweet */
 public class Timer {
+	static private final int CANCELLED = -1, FOREVER = -2;
+
 	// TimerThread access is synchronized using threadLock.
 	// Timer access is synchronized using the Timer instance.
 	// Task access is synchronized using the Task instance.
@@ -51,7 +53,7 @@ public class Timer {
 		}
 	}
 
-	final Array<Task> tasks = new Array(false, 8);
+	private final Array<Task> tasks = new Array(false, 8);
 
 	public Timer () {
 		start();
@@ -69,26 +71,22 @@ public class Timer {
 
 	/** Schedules a task to occur once after the specified delay and then repeatedly at the specified interval until cancelled. */
 	public Task scheduleTask (Task task, float delaySeconds, float intervalSeconds) {
-		return scheduleTask(task, delaySeconds, intervalSeconds, -1);
+		return scheduleTask(task, delaySeconds, intervalSeconds, FOREVER);
 	}
 
-	/** Schedules a task to occur once after the specified delay and then a number of additional times at the specified interval.
-	 * @param repeatCount If negative, the task will repeat forever. */
+	/** Schedules a task to occur once after the specified delay and then a number of additional times at the specified
+	 * interval. */
 	public Task scheduleTask (Task task, float delaySeconds, float intervalSeconds, int repeatCount) {
+		synchronized (task) {
+			if (task.repeatCount != CANCELLED) throw new IllegalArgumentException("The same task may not be scheduled twice.");
+			task.executeTimeMillis = System.nanoTime() / 1000000 + (long)(delaySeconds * 1000);
+			task.intervalMillis = (long)(intervalSeconds * 1000);
+			task.repeatCount = repeatCount;
+		}
+		synchronized (this) {
+			tasks.add(task);
+		}
 		synchronized (threadLock) {
-			synchronized (this) {
-				synchronized (task) {
-					if (task.timer != null) throw new IllegalArgumentException("The same task may not be scheduled twice.");
-					task.timer = this;
-					long timeMillis = System.nanoTime() / 1000000;
-					long executeTimeMillis = timeMillis + (long)(delaySeconds * 1000);
-					if (thread.pauseTimeMillis > 0) executeTimeMillis -= timeMillis - thread.pauseTimeMillis;
-					task.executeTimeMillis = executeTimeMillis;
-					task.intervalMillis = (long)(intervalSeconds * 1000);
-					task.repeatCount = repeatCount;
-					tasks.add(task);
-				}
-			}
 			threadLock.notifyAll();
 		}
 		return task;
@@ -114,13 +112,8 @@ public class Timer {
 
 	/** Cancels all tasks. */
 	public synchronized void clear () {
-		for (int i = 0, n = tasks.size; i < n; i++) {
-			Task task = tasks.get(i);
-			synchronized (task) {
-				task.executeTimeMillis = 0;
-				task.timer = null;
-			}
-		}
+		for (int i = 0, n = tasks.size; i < n; i++)
+			tasks.get(i).cancel();
 		tasks.clear();
 	}
 
@@ -138,8 +131,11 @@ public class Timer {
 					waitMillis = Math.min(waitMillis, task.executeTimeMillis - timeMillis);
 					continue;
 				}
-				if (task.repeatCount == 0) {
-					task.timer = null;
+				if (task.repeatCount != CANCELLED) {
+					if (task.repeatCount == 0) task.repeatCount = CANCELLED;
+					task.app.postRunnable(task);
+				}
+				if (task.repeatCount == CANCELLED) {
 					tasks.removeIndex(i);
 					i--;
 					n--;
@@ -148,7 +144,6 @@ public class Timer {
 					waitMillis = Math.min(waitMillis, task.intervalMillis);
 					if (task.repeatCount > 0) task.repeatCount--;
 				}
-				task.app.postRunnable(task);
 			}
 		}
 		return waitMillis;
@@ -193,8 +188,7 @@ public class Timer {
 	static abstract public class Task implements Runnable {
 		final Application app;
 		long executeTimeMillis, intervalMillis;
-		int repeatCount;
-		volatile Timer timer;
+		int repeatCount = CANCELLED;
 
 		public Task () {
 			app = Gdx.app; // Store which app to postRunnable (eg for multiple LwjglAWTCanvas).
@@ -206,22 +200,9 @@ public class Timer {
 		abstract public void run ();
 
 		/** Cancels the task. It will not be executed until it is scheduled again. This method can be called at any time. */
-		public void cancel () {
-			Timer timer = this.timer;
-			if (timer != null) {
-				synchronized (timer) {
-					synchronized (this) {
-						executeTimeMillis = 0;
-						this.timer = null;
-						timer.tasks.removeValue(this, true);
-					}
-				}
-			} else {
-				synchronized (this) {
-					executeTimeMillis = 0;
-					this.timer = null;
-				}
-			}
+		public synchronized void cancel () {
+			executeTimeMillis = 0;
+			repeatCount = CANCELLED;
 		}
 
 		/** Returns true if this task is scheduled to be executed in the future by a timer. The execution time may be reached at any
@@ -233,9 +214,9 @@ public class Timer {
 		 * 	if (!task.isScheduled()) { ... }
 		 * }
 		 * </pre>
-		 */
-		public boolean isScheduled () {
-			return timer != null;
+		*/
+		public synchronized boolean isScheduled () {
+			return repeatCount != CANCELLED;
 		}
 
 		/** Returns the time in milliseconds when this task will be executed next. */
@@ -248,15 +229,13 @@ public class Timer {
 	 * @author Nathan Sweet */
 	static class TimerThread implements Runnable, LifecycleListener {
 		final Files files;
-		final Application app;
 		final Array<Timer> instances = new Array(1);
 		Timer instance;
-		long pauseTimeMillis;
+		private long pauseMillis;
 
 		public TimerThread () {
 			files = Gdx.files;
-			app = Gdx.app;
-			app.addLifecycleListener(this);
+			Gdx.app.addLifecycleListener(this);
 			resume();
 
 			Thread thread = new Thread(this, "Timer");
@@ -270,7 +249,7 @@ public class Timer {
 					if (thread != this || files != Gdx.files) break;
 
 					long waitMillis = 5000;
-					if (pauseTimeMillis == 0) {
+					if (pauseMillis == 0) {
 						long timeMillis = System.nanoTime() / 1000000;
 						for (int i = 0, n = instances.size; i < n; i++) {
 							try {
@@ -294,17 +273,17 @@ public class Timer {
 
 		public void resume () {
 			synchronized (threadLock) {
-				long delayMillis = System.nanoTime() / 1000000 - pauseTimeMillis;
+				long delayMillis = System.nanoTime() / 1000000 - pauseMillis;
 				for (int i = 0, n = instances.size; i < n; i++)
 					instances.get(i).delay(delayMillis);
-				pauseTimeMillis = 0;
+				pauseMillis = 0;
 				threadLock.notifyAll();
 			}
 		}
 
 		public void pause () {
 			synchronized (threadLock) {
-				pauseTimeMillis = System.nanoTime() / 1000000;
+				pauseMillis = System.nanoTime() / 1000000;
 				threadLock.notifyAll();
 			}
 		}
@@ -315,7 +294,7 @@ public class Timer {
 				instances.clear();
 				threadLock.notifyAll();
 			}
-			app.removeLifecycleListener(this);
+			Gdx.app.removeLifecycleListener(this);
 		}
 	}
 }

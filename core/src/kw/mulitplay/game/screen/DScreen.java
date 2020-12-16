@@ -2,7 +2,6 @@ package kw.mulitplay.game.screen;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -90,7 +89,7 @@ public class DScreen extends BaseScreen {
         if (time>=1){
             time = 0;
             current++;
-            timeLabel.setText(current);
+            timeLabel.setText(current+"");
         }
     }
 

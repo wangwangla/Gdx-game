@@ -67,8 +67,7 @@ public interface InputProcessor {
 	public boolean mouseMoved (int screenX, int screenY);
 
 	/** Called when the mouse wheel was scrolled. Will not be called on iOS.
-	 * @param amountX the horizontal scroll amount, negative or positive depending on the direction the wheel was scrolled.
-	 * @param amountY the vertical scroll amount, negative or positive depending on the direction the wheel was scrolled.
+	 * @param amount the scroll amount, -1 or 1 depending on the direction the wheel was scrolled.
 	 * @return whether the input was processed. */
-	public boolean scrolled (float amountX, float amountY);
+	public boolean scrolled (int amount);
 }

@@ -57,7 +57,6 @@ public class MultServer{
         });
     }
 
-
     public void sendMessage(Message action){
         for (Connection connection : array) {
             connection.sendTCP(action);
@@ -69,5 +68,9 @@ public class MultServer{
 
     public void setListener(NetListener listener) {
         this.listener = listener;
+    }
+
+    public void closed(){
+        server.close();
     }
 }

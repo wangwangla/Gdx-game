@@ -30,25 +30,17 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="core" exported="" />
-    <orderEntry type="module" module-name="gdx-backend-lwjgl" exported="" />
     <orderEntry type="module" module-name="gdx" exported="" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-platform-1.9.11-natives-desktop" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-box2d-platform-1.9.11-natives-desktop" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-ai-1.8.2" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: ashley-1.7.3" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: box2dlights-1.5" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: artemis-odb-2.3.0" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-box2d-1.6.2" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-1.9.8" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: gdx-backend-lwjgl" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: gdx-natives" level="project" />
     <orderEntry type="library" exported="" name="Gradle: gdx-backend-lwjgl-natives" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: jlayer-1.0.1-libgdx" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: jorbis" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: lwjgl" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: gdx-tools" level="project" />
     <orderEntry type="library" exported="" scope="RUNTIME" name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug" level="project" />
     <orderEntry type="library" exported="" scope="RUNTIME" name="Gradle: kryonet-9-7-14" level="project" />
     <orderEntry type="library" exported="" scope="RUNTIME" name="Gradle: objenesis-2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: kryonet-9-7-14" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: objenesis-2.1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: desktop.desktop-1.0" level="project" />
   </component>
 </module>

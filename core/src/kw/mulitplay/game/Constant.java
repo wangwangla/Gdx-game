@@ -2,11 +2,7 @@ package kw.mulitplay.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.net.MultClient;

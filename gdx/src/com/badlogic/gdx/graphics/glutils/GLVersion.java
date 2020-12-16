@@ -19,6 +19,8 @@ package com.badlogic.gdx.graphics.glutils;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,12 +37,12 @@ public class GLVersion {
 
 	private final String TAG = "GLVersion";
 
-	public GLVersion (Application.ApplicationType1 appType, String versionString, String vendorString, String rendererString) {
-		if (appType == Application.ApplicationType1.Android) this.type = Type.GLES;
-		else if (appType == Application.ApplicationType1.iOS) this.type = Type.GLES;
-		else if (appType == Application.ApplicationType1.Desktop) this.type = Type.OpenGL;
-		else if (appType == Application.ApplicationType1.Applet) this.type = Type.OpenGL;
-		else if (appType == Application.ApplicationType1.WebGL) this.type = Type.WebGL;
+	public GLVersion (Application.ApplicationType appType, String versionString, String vendorString, String rendererString) {
+		if (appType == Application.ApplicationType.Android) this.type = Type.GLES;
+		else if (appType == Application.ApplicationType.iOS) this.type = Type.GLES;
+		else if (appType == Application.ApplicationType.Desktop) this.type = Type.OpenGL;
+		else if (appType == Application.ApplicationType.Applet) this.type = Type.OpenGL;
+		else if (appType == Application.ApplicationType.WebGL) this.type = Type.WebGL;
 		else this.type = Type.NONE;
 
 		if (type == Type.GLES) {

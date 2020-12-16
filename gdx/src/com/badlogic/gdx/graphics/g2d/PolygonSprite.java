@@ -155,10 +155,11 @@ public class PolygonSprite {
 
 	public void setColor (float r, float g, float b, float a) {
 		color.set(r, g, b, a);
-		float packedColor = color.toFloatBits();
+		int intBits = ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
+		float color = NumberUtils.intToFloatColor(intBits);
 		final float[] vertices = this.vertices;
 		for (int i = 2; i < vertices.length; i += Sprite.VERTEX_SIZE)
-			vertices[i] = packedColor;
+			vertices[i] = color;
 	}
 
 	/** Sets the origin in relation to the sprite's position for scaling and rotation. */
@@ -316,8 +317,13 @@ public class PolygonSprite {
 	/** Returns the actual color used in the vertices of this sprite. Modifying the returned color will have unexpected effects
 	 * unless {@link #setColor(Color)} or {@link #setColor(float, float, float, float)} is subsequently called before drawing this
 	 * sprite. */
-	public Color getPackedColor () {
-		Color.abgr8888ToColor(color, vertices[2]);
+	public Color getVertexColor () {
+		int intBits = NumberUtils.floatToIntColor(vertices[2]);
+		Color color = this.color;
+		color.r = (intBits & 0xff) / 255f;
+		color.g = ((intBits >>> 8) & 0xff) / 255f;
+		color.b = ((intBits >>> 16) & 0xff) / 255f;
+		color.a = ((intBits >>> 24) & 0xff) / 255f;
 		return color;
 	}
 
@@ -327,13 +333,12 @@ public class PolygonSprite {
 		float[] regionVertices = region.vertices;
 		float[] textureCoords = region.textureCoords;
 
-		int verticesLength = (regionVertices.length / 2) * 5;
-		if (vertices == null || vertices.length != verticesLength) vertices = new float[verticesLength];
+		if (vertices == null || regionVertices.length != vertices.length) vertices = new float[(regionVertices.length / 2) * 5];
 
 		// Set the color and UVs in this sprite's vertices.
 		float floatColor = color.toFloatBits();
 		float[] vertices = this.vertices;
-		for (int i = 0, v = 2; v < verticesLength; i += 2, v += 5) {
+		for (int i = 0, v = 2, n = regionVertices.length; i < n; i += 2, v += 5) {
 			vertices[v] = floatColor;
 			vertices[v + 1] = textureCoords[i];
 			vertices[v + 2] = textureCoords[i + 1];

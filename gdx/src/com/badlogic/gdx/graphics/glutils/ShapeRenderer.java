@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,19 +33,19 @@ import com.badlogic.gdx.utils.Disposable;
  * screen resolution changes, the projection matrix may need to be updated.
  * <p>
  * Shapes are rendered in batches to increase performance. Standard usage pattern looks as follows:
- * 
+ *
  * <pre>
  * {@code
  * camera.update();
  * shapeRenderer.setProjectionMatrix(camera.combined);
- * 
+ *
  * shapeRenderer.begin(ShapeType.Line);
  * shapeRenderer.setColor(1, 1, 0, 1);
  * shapeRenderer.line(x, y, x2, y2);
  * shapeRenderer.rect(x, y, width, height);
  * shapeRenderer.circle(x, y, radius);
  * shapeRenderer.end();
- * 
+ *
  * shapeRenderer.begin(ShapeType.Filled);
  * shapeRenderer.setColor(0, 1, 0, 1);
  * shapeRenderer.rect(x, y, width, height);
@@ -53,11 +53,11 @@ import com.badlogic.gdx.utils.Disposable;
  * shapeRenderer.end();
  * }
  * </pre>
- * 
+ *
  * ShapeRenderer has a second matrix called the transformation matrix which is used to rotate, scale and translate shapes in a
  * more flexible manner. The following example shows how to rotate a rectangle around its center using the z-axis as the rotation
  * axis and placing it's center at (20, 12, 2):
- * 
+ *
  * <pre>
  * shapeRenderer.begin(ShapeType.Line);
  * shapeRenderer.identity();
@@ -66,7 +66,7 @@ import com.badlogic.gdx.utils.Disposable;
  * shapeRenderer.rect(-width / 2, -height / 2, width, height);
  * shapeRenderer.end();
  * </pre>
- * 
+ *
  * Matrix operations all use postmultiplication and work just like glTranslate, glScale and glRotate. The last transformation
  * specified will be the first that is applied to a shape (rotate then translate in the above example).
  * <p>
@@ -280,7 +280,7 @@ public class ShapeRenderer implements Disposable {
 	public void curve (float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, int segments) {
 		check(ShapeType.Line, null, segments * 2 + 2);
 		float colorBits = color.toFloatBits();
-		
+
 		// Algorithm from: http://www.antigrain.com/research/bezier_interpolation/index.html#PAGE_BEZIER_INTERPOLATION
 		float subdiv_step = 1f / segments;
 		float subdiv_step2 = subdiv_step * subdiv_step;
@@ -474,7 +474,7 @@ public class ShapeRenderer implements Disposable {
 	/** Draws a rectangle in the x/y plane using {@link ShapeType#Line} or {@link ShapeType#Filled}. The x and y specify the lower
 	 * left corner. The originX and originY specify the point about which to rotate the rectangle. */
 	public void rect (float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY,
-		float degrees) {
+					  float degrees) {
 		rect(x, y, originX, originY, width, height, scaleX, scaleY, degrees, color, color, color, color);
 	}
 
@@ -485,7 +485,7 @@ public class ShapeRenderer implements Disposable {
 	 * @param col3 The color at (x + width, y + height)
 	 * @param col4 The color at (x, y + height) */
 	public void rect (float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY,
-		float degrees, Color col1, Color col2, Color col3, Color col4) {
+					  float degrees, Color col1, Color col2, Color col3, Color col4) {
 		check(ShapeType.Line, ShapeType.Filled, 8);
 
 		float cos = MathUtils.cosDeg(degrees);
@@ -599,7 +599,7 @@ public class ShapeRenderer implements Disposable {
 			renderer.vertex(x1 - tx, y1 - ty, 0);
 		}
 	}
-	
+
 	/** Draws a line using a rotated rectangle, where with one edge is centered at x1, y1 and the opposite edge centered at x2, y2. */
 	public void rectLine (float x1, float y1, float x2, float y2, float width, Color c1, Color c2) {
 		check(ShapeType.Line, ShapeType.Filled, 8);
@@ -745,11 +745,11 @@ public class ShapeRenderer implements Disposable {
 			renderer.vertex(x + width, y + height, z + depth);
 
 			renderer.color(colorBits);
-			renderer.vertex(x + width, y + height, z + depth);
+			renderer.vertex(x, y + height, z + depth);
 			renderer.color(colorBits);
 			renderer.vertex(x, y, z + depth);
 			renderer.color(colorBits);
-			renderer.vertex(x, y + height, z + depth);
+			renderer.vertex(x + width, y + height, z + depth);
 
 			// Left
 			renderer.color(colorBits);
@@ -960,7 +960,7 @@ public class ShapeRenderer implements Disposable {
 
 				renderer.color(colorBits);
 				renderer.vertex(cx + (width * 0.5f * MathUtils.cos((i + 1) * angle)),
-					cy + (height * 0.5f * MathUtils.sin((i + 1) * angle)), 0);
+						cy + (height * 0.5f * MathUtils.sin((i + 1) * angle)), 0);
 			}
 		} else {
 			for (int i = 0; i < segments; i++) {
@@ -972,11 +972,11 @@ public class ShapeRenderer implements Disposable {
 
 				renderer.color(colorBits);
 				renderer.vertex(cx + (width * 0.5f * MathUtils.cos((i + 1) * angle)),
-					cy + (height * 0.5f * MathUtils.sin((i + 1) * angle)), 0);
+						cy + (height * 0.5f * MathUtils.sin((i + 1) * angle)), 0);
 			}
 		}
 	}
-	
+
 	/** Calls {@link #ellipse(float, float, float, float, float, int)} by estimating the number of segments needed for a smooth ellipse. */
 	public void ellipse (float x, float y, float width, float height, float rotation) {
 		ellipse(x, y, width, height, rotation, Math.max(1, (int)(12 * (float)Math.cbrt(Math.max(width * 0.5f, height * 0.5f)))));
@@ -988,7 +988,7 @@ public class ShapeRenderer implements Disposable {
 		check(ShapeType.Line, ShapeType.Filled, segments * 3);
 		float colorBits = color.toFloatBits();
 		float angle = 2 * MathUtils.PI / segments;
-		
+
 		rotation = MathUtils.PI * rotation / 180f;
 		float sin = MathUtils.sin(rotation);
 		float cos = MathUtils.cos(rotation);
@@ -1000,7 +1000,7 @@ public class ShapeRenderer implements Disposable {
 			for (int i = 0; i < segments; i++) {
 				renderer.color(colorBits);
 				renderer.vertex(cx + cos * x1 - sin * y1, cy + sin * x1 + cos * y1, 0);
-				
+
 				x1 = (width * 0.5f * MathUtils.cos((i + 1) * angle));
 				y1 = (height * 0.5f * MathUtils.sin((i + 1) * angle));
 
@@ -1014,7 +1014,7 @@ public class ShapeRenderer implements Disposable {
 
 				renderer.color(colorBits);
 				renderer.vertex(cx, cy, 0);
-				
+
 				x1 = (width * 0.5f * MathUtils.cos((i + 1) * angle));
 				y1 = (height * 0.5f * MathUtils.sin((i + 1) * angle));
 
@@ -1200,7 +1200,6 @@ public class ShapeRenderer implements Disposable {
 
 	public void flush () {
 		ShapeType type = shapeType;
-		if (type == null) return;
 		end();
 		begin(type);
 	}

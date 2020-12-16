@@ -98,7 +98,7 @@ public interface Application {
 	/** Enumeration of possible {@link Application} types
 	 * 
 	 * @author mzechner */
-	public enum ApplicationType1 {
+	public enum ApplicationType {
 		Android, Desktop, HeadlessDesktop, Applet, WebGL, iOS
 	}
 
@@ -157,8 +157,8 @@ public interface Application {
 	/** @return the current {@link ApplicationLogger} */
 	public ApplicationLogger getApplicationLogger ();
 
-	/** @return what {@link ApplicationType1} this application has, e.g. Android or Desktop */
-	public ApplicationType1 getType ();
+	/** @return what {@link ApplicationType} this application has, e.g. Android or Desktop */
+	public ApplicationType getType ();
 
 	/** @return the Android API level on Android, the major OS version on iOS (5, 6, 7, ..), or 0 on the desktop. */
 	public int getVersion ();

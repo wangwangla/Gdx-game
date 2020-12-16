@@ -320,7 +320,7 @@ public final class Affine2 implements Serializable {
 	}
 
 	/** Sets this matrix to the product of two matrices.
-	 * @param l Left matrix.
+	 * @param l Left matrix.x
 	 * @param r Right matrix.
 	 * @return This matrix for the purpose of chaining operations. */
 	public Affine2 setToProduct (Affine2 l, Affine2 r) {

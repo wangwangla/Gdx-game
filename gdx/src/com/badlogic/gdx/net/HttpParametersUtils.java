@@ -25,10 +25,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.HttpRequest;
 
 /** Provides utility methods to work with the {@link HttpRequest} content and parameters. */
-public final class HttpParametersUtils {
-
-	private HttpParametersUtils () {
-	}
+public class HttpParametersUtils {
 
 	public static String defaultEncoding = "UTF-8";
 	public static String nameValueSeparator = "=";
@@ -39,7 +36,7 @@ public final class HttpParametersUtils {
 	 * @return The String with the parameters encoded. */
 	public static String convertHttpParameters (Map<String, String> parameters) {
 		Set<String> keySet = parameters.keySet();
-		StringBuilder convertedParameters = new StringBuilder();
+		StringBuffer convertedParameters = new StringBuffer();
 		for (String name : keySet) {
 			convertedParameters.append(encode(name, defaultEncoding));
 			convertedParameters.append(nameValueSeparator);

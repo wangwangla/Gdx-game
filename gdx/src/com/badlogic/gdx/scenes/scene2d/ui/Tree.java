@@ -16,16 +16,11 @@
 
 package com.badlogic.gdx.scenes.scene2d.ui;
 
-import com.badlogic.gdx.Application.ApplicationType1;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -33,27 +28,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Null;
 
-/** A tree widget where each node has an icon, actor, and child nodes.
+/** A tree widget where each node has an iconone, actor, and child nodes.
  * <p>
  * The preferred size of the tree is determined by the preferred size of the actors for the expanded nodes.
  * <p>
  * {@link ChangeEvent} is fired when the selected node changes.
- * @param <N> The type of nodes in the tree.
- * @param <V> The type of values for each node.
  * @author Nathan Sweet */
-public class Tree<N extends Node, V> extends WidgetGroup {
-	static private final Vector2 tmp = new Vector2();
-
+public class Tree extends WidgetGroup {
 	TreeStyle style;
-	final Array<N> rootNodes = new Array();
-	final Selection<N> selection;
-	float ySpacing = 4, iconSpacingLeft = 2, iconSpacingRight = 2, paddingLeft, paddingRight, indentSpacing;
-	private float prefWidth, prefHeight;
+	final Array<Node> rootNodes = new Array();
+	final Selection<Node> selection;
+	float ySpacing = 4, iconSpacingLeft = 2, iconSpacingRight = 2, padding = 0, indentSpacing;
+	private float leftColumnWidth, prefWidth, prefHeight;
 	private boolean sizeInvalid = true;
-	private N foundNode, overNode;
-	N rangeStart;
+	private Node foundNode;
+	Node overNode, rangeStart;
 	private ClickListener clickListener;
 
 	public Tree (Skin skin) {
@@ -65,7 +55,7 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 	}
 
 	public Tree (TreeStyle style) {
-		selection = new Selection<N>() {
+		selection = new Selection<Node>() {
 			protected void changed () {
 				switch (size()) {
 				case 0:
@@ -86,13 +76,13 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 	private void initialize () {
 		addListener(clickListener = new ClickListener() {
 			public void clicked (InputEvent event, float x, float y) {
-				N node = getNodeAt(y);
+				Node node = getNodeAt(y);
 				if (node == null) return;
 				if (node != getNodeAt(getTouchDownY())) return;
-				if (selection.getMultiple() && selection.notEmpty() && UIUtils.shift()) {
+				if (selection.getMultiple() && selection.hasItems() && UIUtils.shift()) {
 					// Select range (shift).
 					if (rangeStart == null) rangeStart = node;
-					N rangeStart = Tree.this.rangeStart;
+					Node rangeStart = Tree.this.rangeStart;
 					if (!UIUtils.ctrl()) selection.clear();
 					float start = rangeStart.actor.getY(), end = node.actor.getY();
 					if (start > end)
@@ -107,7 +97,7 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 					return;
 				}
 				if (node.children.size > 0 && (!selection.getMultiple() || !UIUtils.ctrl())) {
-					// Toggle expanded if left of icon.
+					// Toggle expanded.
 					float rowX = node.actor.getX();
 					if (node.icon != null) rowX -= iconSpacingRight + node.icon.getMinWidth();
 					if (x < rowX) {
@@ -125,12 +115,7 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 				return false;
 			}
 
-			public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
-				super.enter(event, x, y, pointer, fromActor);
-				setOverNode(getNodeAt(y));
-			}
-
-			public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
+			public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
 				super.exit(event, x, y, pointer, toActor);
 				if (toActor == null || !toActor.isDescendantOf(Tree.this)) setOverNode(null);
 			}
@@ -139,52 +124,29 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 
 	public void setStyle (TreeStyle style) {
 		this.style = style;
-
-		// Reasonable default.
-		if (indentSpacing == 0) indentSpacing = plusMinusWidth();
+		indentSpacing = Math.max(style.plus.getMinWidth(), style.minus.getMinWidth()) + iconSpacingLeft;
 	}
 
-	public void add (N node) {
+	public void add (Node node) {
 		insert(rootNodes.size, node);
 	}
 
-	public void insert (int index, N node) {
-		if (node.parent != null) {
-			node.parent.remove(node);
-			node.parent = null;
-		} else {
-			int existingIndex = rootNodes.indexOf(node, true);
-			if (existingIndex != -1) {
-				if (existingIndex == index) return;
-				if (existingIndex < index) index--;
-				rootNodes.removeIndex(existingIndex);
-				int actorIndex = node.actor.getZIndex();
-				if (actorIndex != -1) node.removeFromTree(this, actorIndex);
-			}
-		}
-
+	public void insert (int index, Node node) {
+		remove(node);
+		node.parent = null;
 		rootNodes.insert(index, node);
-
-		int actorIndex;
-		if (index == 0)
-			actorIndex = 0;
-		else if (index < rootNodes.size - 1)
-			actorIndex = rootNodes.get(index + 1).actor.getZIndex();
-		else {
-			N before = rootNodes.get(index - 1);
-			actorIndex = before.actor.getZIndex() + before.countActors();
-		}
-		node.addToTree(this, actorIndex);
+		node.addToTree(this);
+		invalidateHierarchy();
 	}
 
-	public void remove (N node) {
+	public void remove (Node node) {
 		if (node.parent != null) {
 			node.parent.remove(node);
 			return;
 		}
-		if (!rootNodes.removeValue(node, true)) return;
-		int actorIndex = node.actor.getZIndex();
-		if (actorIndex != -1) node.removeFromTree(this, actorIndex);
+		rootNodes.removeValue(node, true);
+		node.removeFromTree(this);
+		invalidateHierarchy();
 	}
 
 	/** Removes all tree nodes. */
@@ -195,7 +157,7 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		selection.clear();
 	}
 
-	public Array<N> getNodes () {
+	public Array<Node> getNodes () {
 		return rootNodes;
 	}
 
@@ -204,32 +166,30 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		sizeInvalid = true;
 	}
 
-	private float plusMinusWidth () {
-		float width = Math.max(style.plus.getMinWidth(), style.minus.getMinWidth());
-		if (style.plusOver != null) width = Math.max(width, style.plusOver.getMinWidth());
-		if (style.minusOver != null) width = Math.max(width, style.minusOver.getMinWidth());
-		return width;
-	}
-
 	private void computeSize () {
 		sizeInvalid = false;
-		prefWidth = plusMinusWidth();
-		prefHeight = 0;
-		computeSize(rootNodes, 0, prefWidth);
-		prefWidth += paddingLeft + paddingRight;
+		prefWidth = style.plus.getMinWidth();
+		prefWidth = Math.max(prefWidth, style.minus.getMinWidth());
+		prefHeight = getHeight();
+		leftColumnWidth = 0;
+		computeSize(rootNodes, indentSpacing);
+		leftColumnWidth += iconSpacingLeft + padding;
+		prefWidth += leftColumnWidth + padding;
+		prefHeight = getHeight() - prefHeight;
 	}
 
-	private void computeSize (Array<N> nodes, float indent, float plusMinusWidth) {
+	private void computeSize (Array<Node> nodes, float indent) {
 		float ySpacing = this.ySpacing;
 		float spacing = iconSpacingLeft + iconSpacingRight;
 		for (int i = 0, n = nodes.size; i < n; i++) {
-			N node = nodes.get(i);
-			float rowWidth = indent + plusMinusWidth;
+			Node node = nodes.get(i);
+			float rowWidth = indent + iconSpacingRight;
 			Actor actor = node.actor;
 			if (actor instanceof Layout) {
 				Layout layout = (Layout)actor;
 				rowWidth += layout.getPrefWidth();
 				node.height = layout.getPrefHeight();
+				layout.pack();
 			} else {
 				rowWidth += actor.getWidth();
 				node.height = actor.getHeight();
@@ -239,32 +199,26 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 				node.height = Math.max(node.height, node.icon.getMinHeight());
 			}
 			prefWidth = Math.max(prefWidth, rowWidth);
-			prefHeight += node.height + ySpacing;
-			if (node.expanded) computeSize(node.children, indent + indentSpacing, plusMinusWidth);
+			prefHeight -= node.height + ySpacing;
+			if (node.expanded) computeSize(node.children, indent + indentSpacing);
 		}
 	}
 
 	public void layout () {
 		if (sizeInvalid) computeSize();
-		layout(rootNodes, paddingLeft, getHeight() - ySpacing / 2, plusMinusWidth());
+		layout(rootNodes, leftColumnWidth + indentSpacing + iconSpacingRight, getHeight() - ySpacing / 2);
 	}
 
-	private float layout (Array<N> nodes, float indent, float y, float plusMinusWidth) {
+	private float layout (Array<Node> nodes, float indent, float y) {
 		float ySpacing = this.ySpacing;
-		float iconSpacingLeft = this.iconSpacingLeft;
-		float spacing = iconSpacingLeft + iconSpacingRight;
 		for (int i = 0, n = nodes.size; i < n; i++) {
-			N node = nodes.get(i);
-			float x = indent + plusMinusWidth;
-			if (node.icon != null)
-				x += spacing + node.icon.getMinWidth();
-			else
-				x += iconSpacingLeft;
-			if (node.actor instanceof Layout) ((Layout)node.actor).pack();
+			Node node = nodes.get(i);
+			float x = indent;
+			if (node.icon != null) x += node.icon.getMinWidth();
 			y -= node.getHeight();
 			node.actor.setPosition(x, y);
 			y -= ySpacing;
-			if (node.expanded) y = layout(node.children, indent + indentSpacing, y, plusMinusWidth);
+			if (node.expanded) y = layout(node.children, indent + indentSpacing, y);
 		}
 		return y;
 	}
@@ -273,8 +227,8 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		drawBackground(batch, parentAlpha);
 		Color color = getColor();
 		batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
-		draw(batch, rootNodes, paddingLeft, plusMinusWidth());
-		super.draw(batch, parentAlpha); // Draw node actors.
+		draw(batch, rootNodes, leftColumnWidth);
+		super.draw(batch, parentAlpha); // Draw actors.
 	}
 
 	/** Called to draw the background. Default implementation draws the style background drawable. */
@@ -287,91 +241,46 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 	}
 
 	/** Draws selection, icons, and expand icons. */
-	private void draw (Batch batch, Array<N> nodes, float indent, float plusMinusWidth) {
-		Rectangle cullingArea = getCullingArea();
-		float cullBottom = 0, cullTop = 0;
-		if (cullingArea != null) {
-			cullBottom = cullingArea.y;
-			cullTop = cullBottom + cullingArea.height;
-		}
-		TreeStyle style = this.style;
-		float x = getX(), y = getY(), expandX = x + indent, iconX = expandX + plusMinusWidth + iconSpacingLeft;
+	private void draw (Batch batch, Array<Node> nodes, float indent) {
+		Drawable plus = style.plus, minus = style.minus;
+		float x = getX(), y = getY();
 		for (int i = 0, n = nodes.size; i < n; i++) {
-			N node = nodes.get(i);
+			Node node = nodes.get(i);
 			Actor actor = node.actor;
-			float actorY = actor.getY(), height = node.height;
-			if (cullingArea == null || (actorY + height >= cullBottom && actorY <= cullTop)) {
-				if (selection.contains(node) && style.selection != null) {
-					drawSelection(node, style.selection, batch, x, y + actorY - ySpacing / 2, getWidth(), height + ySpacing);
-				} else if (node == overNode && style.over != null) {
-					drawOver(node, style.over, batch, x, y + actorY - ySpacing / 2, getWidth(), height + ySpacing);
-				}
 
-				if (node.icon != null) {
-					float iconY = y + actorY + Math.round((height - node.icon.getMinHeight()) / 2);
-					batch.setColor(actor.getColor());
-					drawIcon(node, node.icon, batch, iconX, iconY);
-					batch.setColor(1, 1, 1, 1);
-				}
-
-				if (node.children.size > 0) {
-					Drawable expandIcon = getExpandIcon(node, iconX);
-					float iconY = y + actorY + Math.round((height - expandIcon.getMinHeight()) / 2);
-					drawExpandIcon(node, expandIcon, batch, expandX, iconY);
-				}
-			} else if (actorY < cullBottom) {
-				return;
+			if (selection.contains(node) && style.selection != null) {
+				style.selection.draw(batch, x, y + actor.getY() - ySpacing / 2, getWidth(), node.height + ySpacing);
+			} else if (node == overNode && style.over != null) {
+				style.over.draw(batch, x, y + actor.getY() - ySpacing / 2, getWidth(), node.height + ySpacing);
 			}
-			if (node.expanded && node.children.size > 0) draw(batch, node.children, indent + indentSpacing, plusMinusWidth);
+
+			if (node.icon != null) {
+				float iconY = actor.getY() + Math.round((node.height - node.icon.getMinHeight()) / 2);
+				batch.setColor(actor.getColor());
+				node.icon.draw(batch, x + node.actor.getX() - iconSpacingRight - node.icon.getMinWidth(), y + iconY,
+					node.icon.getMinWidth(), node.icon.getMinHeight());
+				batch.setColor(Color.WHITE);
+			}
+
+			if (node.children.size == 0) continue;
+
+			Drawable expandIcon = node.expanded ? minus : plus;
+			float iconY = actor.getY() + Math.round((node.height - expandIcon.getMinHeight()) / 2);
+			expandIcon.draw(batch, x + indent - iconSpacingLeft, y + iconY, expandIcon.getMinWidth(), expandIcon.getMinHeight());
+			if (node.expanded) draw(batch, node.children, indent + indentSpacing);
 		}
-	}
-
-	protected void drawSelection (N node, Drawable selection, Batch batch, float x, float y, float width, float height) {
-		selection.draw(batch, x, y, width, height);
-	}
-
-	protected void drawOver (N node, Drawable over, Batch batch, float x, float y, float width, float height) {
-		over.draw(batch, x, y, width, height);
-	}
-
-	protected void drawExpandIcon (N node, Drawable expandIcon, Batch batch, float x, float y) {
-		expandIcon.draw(batch, x, y, expandIcon.getMinWidth(), expandIcon.getMinHeight());
-	}
-
-	protected void drawIcon (N node, Drawable icon, Batch batch, float x, float y) {
-		icon.draw(batch, x, y, icon.getMinWidth(), icon.getMinHeight());
-	}
-
-	/** Returns the drawable for the expand icon. The default implementation returns {@link TreeStyle#plusOver} or
-	 * {@link TreeStyle#minusOver} on the desktop if the node is the {@link #getOverNode() over node}, the mouse is left of
-	 * <code>iconX</code>, and clicking would expand the node.
-	 * @param iconX The X coordinate of the over node's icon. */
-	protected Drawable getExpandIcon (N node, float iconX) {
-		boolean over = false;
-		if (node == overNode //
-			&& Gdx.app.getType() == ApplicationType1.Desktop //
-			&& (!selection.getMultiple() || (!UIUtils.ctrl() && !UIUtils.shift())) //
-		) {
-			float mouseX = screenToLocalCoordinates(tmp.set(Gdx.input.getX(), 0)).x;
-			if (mouseX >= 0 && mouseX < iconX) over = true;
-		}
-		if (over) {
-			Drawable icon = node.expanded ? style.minusOver : style.plusOver;
-			if (icon != null) return icon;
-		}
-		return node.expanded ? style.minus : style.plus;
 	}
 
 	/** @return May be null. */
-	public @Null N getNodeAt (float y) {
+	public Node getNodeAt (float y) {
 		foundNode = null;
 		getNodeAt(rootNodes, y, getHeight());
 		return foundNode;
 	}
 
-	private float getNodeAt (Array<N> nodes, float y, float rowY) {
+	private float getNodeAt (Array<Node> nodes, float y, float rowY) {
 		for (int i = 0, n = nodes.size; i < n; i++) {
-			N node = nodes.get(i);
+			Node node = nodes.get(i);
 			float height = node.height;
 			rowY -= node.getHeight() - height; // Node subclass may increase getHeight.
 			if (y >= rowY - height - ySpacing && y < rowY) {
@@ -387,9 +296,9 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		return rowY;
 	}
 
-	void selectNodes (Array<N> nodes, float low, float high) {
+	void selectNodes (Array<Node> nodes, float low, float high) {
 		for (int i = 0, n = nodes.size; i < n; i++) {
-			N node = nodes.get(i);
+			Node node = nodes.get(i);
 			if (node.actor.getY() < low) break;
 			if (!node.isSelectable()) continue;
 			if (node.actor.getY() <= high) selection.add(node);
@@ -397,74 +306,37 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		}
 	}
 
-	public Selection<N> getSelection () {
+	public Selection<Node> getSelection () {
 		return selection;
-	}
-
-	/** Returns the first selected node, or null. */
-	public @Null N getSelectedNode () {
-		return selection.first();
-	}
-
-	/** Returns the first selected value, or null. */
-	public @Null V getSelectedValue () {
-		N node = selection.first();
-		return node == null ? null : (V)node.getValue();
 	}
 
 	public TreeStyle getStyle () {
 		return style;
 	}
 
-	/** If the order of the root nodes is changed, {@link #updateRootNodes()} must be called to ensure the nodes' actors are in the
-	 * correct order. */
-	public Array<N> getRootNodes () {
+	public Array<Node> getRootNodes () {
 		return rootNodes;
 	}
 
-	/** Updates the order of the actors in the tree for all root nodes and all child nodes. This is useful after changing the order
-	 * of {@link #getRootNodes()}.
-	 * @see Node#updateChildren() */
-	public void updateRootNodes () {
-		for (int i = 0, n = rootNodes.size; i < n; i++) {
-			N node = rootNodes.get(i);
-			int actorIndex = node.actor.getZIndex();
-			if (actorIndex != -1) node.removeFromTree(this, actorIndex);
-		}
-		for (int i = 0, n = rootNodes.size, actorIndex = 0; i < n; i++)
-			actorIndex += rootNodes.get(i).addToTree(this, actorIndex);
-	}
-
 	/** @return May be null. */
-	public @Null N getOverNode () {
+	public Node getOverNode () {
 		return overNode;
 	}
 
 	/** @return May be null. */
-	public @Null V getOverValue () {
+	public Object getOverObject () {
 		if (overNode == null) return null;
-		return (V)overNode.getValue();
+		return overNode.getObject();
 	}
 
 	/** @param overNode May be null. */
-	public void setOverNode (@Null N overNode) {
+	public void setOverNode (Node overNode) {
 		this.overNode = overNode;
 	}
 
 	/** Sets the amount of horizontal space between the nodes and the left/right edges of the tree. */
 	public void setPadding (float padding) {
-		paddingLeft = padding;
-		paddingRight = padding;
-	}
-
-	/** Sets the amount of horizontal space between the nodes and the left/right edges of the tree. */
-	public void setPadding (float left, float right) {
-		this.paddingLeft = left;
-		this.paddingRight = right;
-	}
-
-	public void setIndentSpacing (float indentSpacing) {
-		this.indentSpacing = indentSpacing;
+		this.padding = padding;
 	}
 
 	/** Returns the amount of horizontal space for indentation level. */
@@ -481,8 +353,7 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		return ySpacing;
 	}
 
-	/** Sets the amount of horizontal space left and right of the node's icon. If a node has no icon, the left spacing is used
-	 * between the plus/minus drawable and the node's actor. */
+	/** Sets the amount of horizontal space between the node actors and icons. */
 	public void setIconSpacing (float left, float right) {
 		this.iconSpacingLeft = left;
 		this.iconSpacingRight = right;
@@ -498,13 +369,13 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		return prefHeight;
 	}
 
-	public void findExpandedValues (Array<V> values) {
-		findExpandedValues(rootNodes, values);
+	public void findExpandedObjects (Array objects) {
+		findExpandedObjects(rootNodes, objects);
 	}
 
-	public void restoreExpandedValues (Array<V> values) {
-		for (int i = 0, n = values.size; i < n; i++) {
-			N node = findNode(values.get(i));
+	public void restoreExpandedObjects (Array objects) {
+		for (int i = 0, n = objects.size; i < n; i++) {
+			Node node = findNode(objects.get(i));
 			if (node != null) {
 				node.setExpanded(true);
 				node.expandTo();
@@ -512,29 +383,29 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		}
 	}
 
-	static boolean findExpandedValues (Array<? extends Node> nodes, Array values) {
+	static boolean findExpandedObjects (Array<Node> nodes, Array objects) {
 		boolean expanded = false;
 		for (int i = 0, n = nodes.size; i < n; i++) {
 			Node node = nodes.get(i);
-			if (node.expanded && !findExpandedValues(node.children, values)) values.add(node.value);
+			if (node.expanded && !findExpandedObjects(node.children, objects)) objects.add(node.object);
 		}
 		return expanded;
 	}
 
-	/** Returns the node with the specified value, or null. */
-	public @Null N findNode (V value) {
-		if (value == null) throw new IllegalArgumentException("value cannot be null.");
-		return (N)findNode(rootNodes, value);
+	/** Returns the node with the specified object, or null. */
+	public Node findNode (Object object) {
+		if (object == null) throw new IllegalArgumentException("object cannot be null.");
+		return findNode(rootNodes, object);
 	}
 
-	static @Null Node findNode (Array<? extends Node> nodes, Object value) {
+	static Node findNode (Array<Node> nodes, Object object) {
 		for (int i = 0, n = nodes.size; i < n; i++) {
 			Node node = nodes.get(i);
-			if (value.equals(node.value)) return node;
+			if (object.equals(node.object)) return node;
 		}
 		for (int i = 0, n = nodes.size; i < n; i++) {
 			Node node = nodes.get(i);
-			Node found = findNode(node.children, value);
+			Node found = findNode(node.children, object);
 			if (found != null) return found;
 		}
 		return null;
@@ -544,7 +415,7 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		collapseAll(rootNodes);
 	}
 
-	static void collapseAll (Array<? extends Node> nodes) {
+	static void collapseAll (Array<Node> nodes) {
 		for (int i = 0, n = nodes.size; i < n; i++) {
 			Node node = nodes.get(i);
 			node.setExpanded(false);
@@ -556,7 +427,7 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		expandAll(rootNodes);
 	}
 
-	static void expandAll (Array<? extends Node> nodes) {
+	static void expandAll (Array<Node> nodes) {
 		for (int i = 0, n = nodes.size; i < n; i++)
 			nodes.get(i).expandAll();
 	}
@@ -566,30 +437,19 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		return clickListener;
 	}
 
-	/** A {@link Tree} node which has an actor and value.
-	 * <p>
-	 * A subclass can be used so the generic type parameters don't need to be specified repeatedly.
-	 * @param <N> The type for the node's parent and child nodes.
-	 * @param <V> The type for the node's value.
-	 * @param <A> The type for the node's actor.
-	 * @author Nathan Sweet */
-	static abstract public class Node<N extends Node, V, A extends Actor> {
-		A actor;
-		N parent;
-		final Array<N> children = new Array(0);
+	static public class Node {
+		final Actor actor;
+		Node parent;
+		final Array<Node> children = new Array(0);
 		boolean selectable = true;
 		boolean expanded;
 		Drawable icon;
 		float height;
-		V value;
+		Object object;
 
-		public Node (A actor) {
+		public Node (Actor actor) {
 			if (actor == null) throw new IllegalArgumentException("actor cannot be null.");
 			this.actor = actor;
-		}
-
-		/** Creates a node without an actor. An actor must be set using {@link #setActor(Actor)} before this node can be used. */
-		public Node () {
 		}
 
 		public void setExpanded (boolean expanded) {
@@ -598,77 +458,49 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 			if (children.size == 0) return;
 			Tree tree = getTree();
 			if (tree == null) return;
-			Object[] children = this.children.items;
-			int actorIndex = actor.getZIndex() + 1;
 			if (expanded) {
-				for (int i = 0, n = this.children.size; i < n; i++)
-					actorIndex += ((N)children[i]).addToTree(tree, actorIndex);
+				for (int i = 0, n = children.size; i < n; i++)
+					children.get(i).addToTree(tree);
 			} else {
-				for (int i = 0, n = this.children.size; i < n; i++)
-					((N)children[i]).removeFromTree(tree, actorIndex);
+				for (int i = children.size - 1; i >= 0; i--)
+					children.get(i).removeFromTree(tree);
 			}
+			tree.invalidateHierarchy();
 		}
 
-		/** Called to add the actor to the tree when the node's parent is expanded.
-		 * @return The number of node actors added to the tree. */
-		protected int addToTree (Tree<N, V> tree, int actorIndex) {
-			tree.addActorAt(actorIndex, actor);
-			if (!expanded) return 1;
-			int childIndex = actorIndex + 1;
-			Object[] children = this.children.items;
-			for (int i = 0, n = this.children.size; i < n; i++)
-				childIndex += ((N)children[i]).addToTree(tree, childIndex);
-			return childIndex - actorIndex;
-		}
-
-		/** Called to remove the actor from the tree, eg when the node is removed or the node's parent is collapsed. */
-		protected void removeFromTree (Tree<N, V> tree, int actorIndex) {
-			Actor removeActorAt = tree.removeActorAt(actorIndex, true);
-			// assert removeActorAt != actor; // If false, either 1) there's a bug, or 2) the children were modified.
+		/** Called to add the actor to the tree when the node's parent is expanded. */
+		protected void addToTree (Tree tree) {
+			tree.addActor(actor);
 			if (!expanded) return;
 			Object[] children = this.children.items;
-			for (int i = 0, n = this.children.size; i < n; i++)
-				((N)children[i]).removeFromTree(tree, actorIndex);
+			for (int i = this.children.size - 1; i >= 0; i--)
+				((Node)children[i]).addToTree(tree);
 		}
 
-		public void add (N node) {
+		/** Called to remove the actor from the tree when the node's parent is collapsed. */
+		protected void removeFromTree (Tree tree) {
+			tree.removeActor(actor);
+			if (!expanded) return;
+			Object[] children = this.children.items;
+			for (int i = this.children.size - 1; i >= 0; i--)
+				((Node)children[i]).removeFromTree(tree);
+		}
+
+		public void add (Node node) {
 			insert(children.size, node);
 		}
 
-		public void addAll (Array<N> nodes) {
+		public void addAll (Array<Node> nodes) {
 			for (int i = 0, n = nodes.size; i < n; i++)
 				insert(children.size, nodes.get(i));
 		}
 
-		public void insert (int childIndex, N node) {
+		public void insert (int index, Node node) {
 			node.parent = this;
-			children.insert(childIndex, node);
-			if (!expanded) return;
-			Tree tree = getTree();
-			if (tree != null) {
-				int actorIndex;
-				if (childIndex == 0)
-					actorIndex = actor.getZIndex() + 1;
-				else if (childIndex < children.size - 1)
-					actorIndex = children.get(childIndex + 1).actor.getZIndex();
-				else {
-					N before = children.get(childIndex - 1);
-					actorIndex = before.actor.getZIndex() + before.countActors();
-				}
-				node.addToTree(tree, actorIndex);
-			}
+			children.insert(index, node);
+			updateChildren();
 		}
 
-		int countActors () {
-			if (!expanded) return 1;
-			int count = 1;
-			Object[] children = this.children.items;
-			for (int i = 0, n = this.children.size; i < n; i++)
-				count += ((N)children[i]).countActors();
-			return count;
-		}
-
-		/** Remove this node from its parent. */
 		public void remove () {
 			Tree tree = getTree();
 			if (tree != null)
@@ -677,49 +509,33 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 				parent.remove(this);
 		}
 
-		/** Remove the specified child node from this node. Does nothing if the node is not a child of this node. */
-		public void remove (N node) {
-			if (!children.removeValue(node, true)) return;
+		public void remove (Node node) {
+			children.removeValue(node, true);
 			if (!expanded) return;
 			Tree tree = getTree();
-			if (tree != null) node.removeFromTree(tree, node.actor.getZIndex());
+			if (tree == null) return;
+			node.removeFromTree(tree);
+			if (children.size == 0) expanded = false;
 		}
 
-		/** Removes all children from this node. */
-		public void clearChildren () {
-			if (expanded) {
-				Tree tree = getTree();
-				if (tree != null) {
-					int actorIndex = actor.getZIndex() + 1;
-					Object[] children = this.children.items;
-					for (int i = 0, n = this.children.size; i < n; i++)
-						((N)children[i]).removeFromTree(tree, actorIndex);
-				}
+		public void removeAll () {
+			Tree tree = getTree();
+			if (tree != null) {
+				Object[] children = this.children.items;
+				for (int i = this.children.size - 1; i >= 0; i--)
+					((Node)children[i]).removeFromTree(tree);
 			}
 			children.clear();
 		}
 
-		/** Returns the tree this node's actor is currently in, or null. The actor is only in the tree when all of its parent nodes
-		 * are expanded. */
-		public @Null Tree<N, V> getTree () {
+		/** Returns the tree this node is currently in, or null. */
+		public Tree getTree () {
 			Group parent = actor.getParent();
-			if (parent instanceof Tree) return (Tree)parent;
-			return null;
+			if (!(parent instanceof Tree)) return null;
+			return (Tree)parent;
 		}
 
-		public void setActor (A newActor) {
-			if (actor != null) {
-				Tree<N, V> tree = getTree();
-				if (tree != null) {
-					int index = actor.getZIndex();
-					tree.removeActorAt(index, true);
-					tree.addActorAt(index, newActor);
-				}
-			}
-			actor = newActor;
-		}
-
-		public A getActor () {
+		public Actor getActor () {
 			return actor;
 		}
 
@@ -727,53 +543,42 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 			return expanded;
 		}
 
-		/** If the children order is changed, {@link #updateChildren()} must be called to ensure the node's actors are in the
-		 * correct order. That is not necessary if this node is not in the tree or is not expanded, because then the child node's
-		 * actors are not in the tree. */
-		public Array<N> getChildren () {
+		/** If the children order is changed, {@link #updateChildren()} must be called. */
+		public Array<Node> getChildren () {
 			return children;
 		}
 
-		public boolean hasChildren () {
-			return children.size > 0;
-		}
-
-		/** Updates the order of the actors in the tree for this node and all child nodes. This is useful after changing the order
-		 * of {@link #getChildren()}.
-		 * @see Tree#updateRootNodes() */
+		/** Adds the child node actors to the tree again. This is useful after changing the order of {@link #getChildren()}. */
 		public void updateChildren () {
 			if (!expanded) return;
 			Tree tree = getTree();
 			if (tree == null) return;
-			Object[] children = this.children.items;
-			int n = this.children.size;
-			int actorIndex = actor.getZIndex() + 1;
-			for (int i = 0; i < n; i++)
-				((N)children[i]).removeFromTree(tree, actorIndex);
-			for (int i = 0; i < n; i++)
-				actorIndex += ((N)children[i]).addToTree(tree, actorIndex);
+			for (int i = children.size - 1; i >= 0; i--)
+				children.get(i).removeFromTree(tree);
+			for (int i = 0, n = children.size; i < n; i++)
+				children.get(i).addToTree(tree);
 		}
 
 		/** @return May be null. */
-		public @Null N getParent () {
+		public Node getParent () {
 			return parent;
 		}
 
-		/** Sets an icon that will be drawn to the left of the actor. */
-		public void setIcon (@Null Drawable icon) {
+		/** Sets an iconone that will be drawn to the left of the actor. */
+		public void setIcon (Drawable icon) {
 			this.icon = icon;
 		}
 
-		public @Null V getValue () {
-			return value;
+		public Object getObject () {
+			return object;
 		}
 
-		/** Sets an application specific value for this node. */
-		public void setValue (@Null V value) {
-			this.value = value;
+		/** Sets an application specific object for this node. */
+		public void setObject (Object object) {
+			this.object = object;
 		}
 
-		public @Null Drawable getIcon () {
+		public Drawable getIcon () {
 			return icon;
 		}
 
@@ -787,11 +592,11 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 			return level;
 		}
 
-		/** Returns this node or the child node with the specified value, or null. */
-		public @Null N findNode (V value) {
-			if (value == null) throw new IllegalArgumentException("value cannot be null.");
-			if (value.equals(this.value)) return (N)this;
-			return (N)Tree.findNode(children, value);
+		/** Returns this node or the child node with the specified object, or null. */
+		public Node findNode (Object object) {
+			if (object == null) throw new IllegalArgumentException("object cannot be null.");
+			if (object.equals(this.object)) return this;
+			return Tree.findNode(children, object);
 		}
 
 		/** Collapses all nodes under and including this node. */
@@ -823,13 +628,13 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 			this.selectable = selectable;
 		}
 
-		public void findExpandedValues (Array<V> values) {
-			if (expanded && !Tree.findExpandedValues(children, values)) values.add(value);
+		public void findExpandedObjects (Array objects) {
+			if (expanded && !Tree.findExpandedObjects(children, objects)) objects.add(object);
 		}
 
-		public void restoreExpandedValues (Array<V> values) {
-			for (int i = 0, n = values.size; i < n; i++) {
-				N node = findNode(values.get(i));
+		public void restoreExpandedObjects (Array objects) {
+			for (int i = 0, n = objects.size; i < n; i++) {
+				Node node = findNode(objects.get(i));
 				if (node != null) {
 					node.setExpanded(true);
 					node.expandTo();
@@ -842,56 +647,28 @@ public class Tree<N extends Node, V> extends WidgetGroup {
 		public float getHeight () {
 			return height;
 		}
-
-		/** Returns true if the specified node is this node or an ascendant of this node. */
-		public boolean isAscendantOf (N node) {
-			if (node == null) throw new IllegalArgumentException("node cannot be null.");
-			Node current = node;
-			do {
-				if (current == this) return true;
-				current = current.parent;
-			} while (current != null);
-			return false;
-		}
-
-		/** Returns true if the specified node is this node or an descendant of this node. */
-		public boolean isDescendantOf (N node) {
-			if (node == null) throw new IllegalArgumentException("node cannot be null.");
-			Node parent = this;
-			do {
-				if (parent == node) return true;
-				parent = parent.parent;
-			} while (parent != null);
-			return false;
-		}
 	}
 
 	/** The style for a {@link Tree}.
 	 * @author Nathan Sweet */
 	static public class TreeStyle {
 		public Drawable plus, minus;
-		public @Null Drawable plusOver, minusOver;
-		public @Null Drawable over, selection, background;
+		/** Optional. */
+		public Drawable over, selection, background;
 
 		public TreeStyle () {
 		}
 
-		public TreeStyle (Drawable plus, Drawable minus, @Null Drawable selection) {
+		public TreeStyle (Drawable plus, Drawable minus, Drawable selection) {
 			this.plus = plus;
 			this.minus = minus;
 			this.selection = selection;
 		}
 
 		public TreeStyle (TreeStyle style) {
-			plus = style.plus;
-			minus = style.minus;
-
-			plusOver = style.plusOver;
-			minusOver = style.minusOver;
-
-			over = style.over;
-			selection = style.selection;
-			background = style.background;
+			this.plus = style.plus;
+			this.minus = style.minus;
+			this.selection = style.selection;
 		}
 	}
 }

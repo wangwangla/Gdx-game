@@ -18,12 +18,10 @@ package com.badlogic.gdx;
 
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.NumberUtils;
 
 /** Queues events that are later passed to the wrapped {@link InputProcessor}.
  * @author Nathan Sweet */
 public class InputEventQueue implements InputProcessor {
-	static private final int SKIP = -1;
 	static private final int KEY_DOWN = 0;
 	static private final int KEY_UP = 1;
 	static private final int KEY_TYPED = 2;
@@ -54,93 +52,46 @@ public class InputEventQueue implements InputProcessor {
 	}
 
 	public void drain () {
+		IntArray q = processingQueue;
 		synchronized (this) {
 			if (processor == null) {
 				queue.clear();
 				return;
 			}
-			processingQueue.addAll(queue);
+			q.addAll(queue);
 			queue.clear();
 		}
-		int[] q = processingQueue.items;
 		InputProcessor localProcessor = processor;
-		for (int i = 0, n = processingQueue.size; i < n;) {
-			int type = q[i++];
-			currentEventTime = (long)q[i++] << 32 | q[i++] & 0xFFFFFFFFL;
-			switch (type) {
-			case SKIP:
-				i += q[i];
-				break;
+		for (int i = 0, n = q.size; i < n;) {
+			currentEventTime = (long)q.get(i++) << 32 | q.get(i++) & 0xFFFFFFFFL;
+			switch (q.get(i++)) {
 			case KEY_DOWN:
-				localProcessor.keyDown(q[i++]);
+				localProcessor.keyDown(q.get(i++));
 				break;
 			case KEY_UP:
-				localProcessor.keyUp(q[i++]);
+				localProcessor.keyUp(q.get(i++));
 				break;
 			case KEY_TYPED:
-				localProcessor.keyTyped((char)q[i++]);
+				localProcessor.keyTyped((char)q.get(i++));
 				break;
 			case TOUCH_DOWN:
-				localProcessor.touchDown(q[i++], q[i++], q[i++], q[i++]);
+				localProcessor.touchDown(q.get(i++), q.get(i++), q.get(i++), q.get(i++));
 				break;
 			case TOUCH_UP:
-				localProcessor.touchUp(q[i++], q[i++], q[i++], q[i++]);
+				localProcessor.touchUp(q.get(i++), q.get(i++), q.get(i++), q.get(i++));
 				break;
 			case TOUCH_DRAGGED:
-				localProcessor.touchDragged(q[i++], q[i++], q[i++]);
+				localProcessor.touchDragged(q.get(i++), q.get(i++), q.get(i++));
 				break;
 			case MOUSE_MOVED:
-				localProcessor.mouseMoved(q[i++], q[i++]);
+				localProcessor.mouseMoved(q.get(i++), q.get(i++));
 				break;
 			case SCROLLED:
-				localProcessor.scrolled(NumberUtils.intBitsToFloat(q[i++]) , NumberUtils.intBitsToFloat(q[i++]));
+				localProcessor.scrolled(q.get(i++));
 				break;
-			default:
-				throw new RuntimeException();
 			}
 		}
-		processingQueue.clear();
-	}
-
-	private synchronized int next (int nextType, int i) {
-		int[] q = queue.items;
-		for (int n = queue.size; i < n;) {
-			int type = q[i];
-			if (type == nextType) return i;
-			i += 3;
-			switch (type) {
-			case SKIP:
-				i += q[i];
-				break;
-			case KEY_DOWN:
-				i++;
-				break;
-			case KEY_UP:
-				i++;
-				break;
-			case KEY_TYPED:
-				i++;
-				break;
-			case TOUCH_DOWN:
-				i += 4;
-				break;
-			case TOUCH_UP:
-				i += 4;
-				break;
-			case TOUCH_DRAGGED:
-				i += 3;
-				break;
-			case MOUSE_MOVED:
-				i += 2;
-				break;
-			case SCROLLED:
-				i += 2;
-				break;
-			default:
-				throw new RuntimeException();
-			}
-		}
-		return -1;
+		q.clear();
 	}
 
 	private void queueTime () {
@@ -150,29 +101,29 @@ public class InputEventQueue implements InputProcessor {
 	}
 
 	public synchronized boolean keyDown (int keycode) {
-		queue.add(KEY_DOWN);
 		queueTime();
+		queue.add(KEY_DOWN);
 		queue.add(keycode);
 		return false;
 	}
 
 	public synchronized boolean keyUp (int keycode) {
-		queue.add(KEY_UP);
 		queueTime();
+		queue.add(KEY_UP);
 		queue.add(keycode);
 		return false;
 	}
 
 	public synchronized boolean keyTyped (char character) {
-		queue.add(KEY_TYPED);
 		queueTime();
+		queue.add(KEY_TYPED);
 		queue.add(character);
 		return false;
 	}
 
 	public synchronized boolean touchDown (int screenX, int screenY, int pointer, int button) {
-		queue.add(TOUCH_DOWN);
 		queueTime();
+		queue.add(TOUCH_DOWN);
 		queue.add(screenX);
 		queue.add(screenY);
 		queue.add(pointer);
@@ -181,8 +132,8 @@ public class InputEventQueue implements InputProcessor {
 	}
 
 	public synchronized boolean touchUp (int screenX, int screenY, int pointer, int button) {
-		queue.add(TOUCH_UP);
 		queueTime();
+		queue.add(TOUCH_UP);
 		queue.add(screenX);
 		queue.add(screenY);
 		queue.add(pointer);
@@ -191,15 +142,8 @@ public class InputEventQueue implements InputProcessor {
 	}
 
 	public synchronized boolean touchDragged (int screenX, int screenY, int pointer) {
-		// Skip any queued touch dragged events for the same pointer.
-		for (int i = next(TOUCH_DRAGGED, 0); i >= 0; i = next(TOUCH_DRAGGED, i + 6)) {
-			if (queue.get(i + 5) == pointer) {
-				queue.set(i, SKIP);
-				queue.set(i + 3, 3);
-			}
-		}
-		queue.add(TOUCH_DRAGGED);
 		queueTime();
+		queue.add(TOUCH_DRAGGED);
 		queue.add(screenX);
 		queue.add(screenY);
 		queue.add(pointer);
@@ -207,23 +151,17 @@ public class InputEventQueue implements InputProcessor {
 	}
 
 	public synchronized boolean mouseMoved (int screenX, int screenY) {
-		// Skip any queued mouse moved events.
-		for (int i = next(MOUSE_MOVED, 0); i >= 0; i = next(MOUSE_MOVED, i + 5)) {
-			queue.set(i, SKIP);
-			queue.set(i + 3, 2);
-		}
-		queue.add(MOUSE_MOVED);
 		queueTime();
+		queue.add(MOUSE_MOVED);
 		queue.add(screenX);
 		queue.add(screenY);
 		return false;
 	}
 
-	public synchronized boolean scrolled(float amountX, float amountY) {
-		queue.add(SCROLLED);
+	public synchronized boolean scrolled (int amount) {
 		queueTime();
-		queue.add(NumberUtils.floatToIntBits(amountX));
-		queue.add(NumberUtils.floatToIntBits(amountY));
+		queue.add(SCROLLED);
+		queue.add(amount);
 		return false;
 	}
 

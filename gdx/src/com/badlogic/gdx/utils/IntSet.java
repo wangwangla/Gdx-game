@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,49 +16,33 @@
 
 package com.badlogic.gdx.utils;
 
-import java.util.Arrays;
+import com.badlogic.gdx.math.MathUtils;
+
 import java.util.NoSuchElementException;
 
-import static com.badlogic.gdx.utils.ObjectSet.tableSize;
-
-/** An unordered set where the items are unboxed ints. No allocation is done except when growing the table size.
- * <p>
- * This class performs fast contains and remove (typically O(1), worst case O(n) but that is rare in practice). Add may be
- * slightly slower, depending on hash collisions. Hashcodes are rehashed to reduce collisions and the need to resize. Load factors
- * greater than 0.91 greatly increase the chances to resize to the next higher POT size.
- * <p>
- * Unordered sets and maps are not designed to provide especially fast iteration. Iteration is faster with OrderedSet and
- * OrderedMap.
- * <p>
- * This implementation uses linear probing with the backward shift algorithm for removal. Hashcodes are rehashed using Fibonacci
- * hashing, instead of the more common power-of-two mask, to better distribute poor hashCodes (see <a href=
- * "https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/">Malte
- * Skarupke's blog post</a>). Linear probing continues to work even when all hashCodes collide, just more slowly.
- * @author Nathan Sweet
- * @author Tommy Ettinger */
+/** An unordered set that uses int keys. This implementation uses cuckoo hashing using 3 hashes, random walking, and a small stash
+ * for problematic keys. No allocation is done except when growing the table size. <br>
+ * <br>
+ * This set performs very fast contains and remove (typically O(1), worst case O(log(n))). Add may be a bit slower, depending on
+ * hash collisions. Load factors greater than 0.91 greatly increase the chances the set will have to rehash to the next higher POT
+ * size.
+ * @author Nathan Sweet */
 public class IntSet {
+	private static final int PRIME1 = 0xbe1f14b1;
+	private static final int PRIME2 = 0xb4b82e39;
+	private static final int PRIME3 = 0xced1c241;
+	private static final int EMPTY = 0;
+
 	public int size;
 
 	int[] keyTable;
+	int capacity, stashSize;
 	boolean hasZeroValue;
 
-	private final float loadFactor;
-	private int threshold;
-
-	/** Used by {@link #place(int)} to bit shift the upper bits of a {@code long} into a usable range (&gt;= 0 and &lt;=
-	 * {@link #mask}). The shift can be negative, which is convenient to match the number of bits in mask: if mask is a 7-bit
-	 * number, a shift of -7 shifts the upper 7 bits into the lowest 7 positions. This class sets the shift &gt; 32 and &lt; 64,
-	 * which if used with an int will still move the upper bits of an int to the lower bits due to Java's implicit modulus on
-	 * shifts.
-	 * <p>
-	 * {@link #mask} can also be used to mask the low bits of a number, which may be faster for some hashcodes, if
-	 * {@link #place(int)} is overridden. */
-	protected int shift;
-
-	/** A bitmask used to confine hashcodes to the size of the table. Must be all 1 bits in its low positions, ie a power of two
-	 * minus 1. If {@link #place(int)} is overriden, this can be used instead of {@link #shift} to isolate usable bits of a
-	 * hash. */
-	protected int mask;
+	private float loadFactor;
+	private int hashShift, mask, threshold;
+	private int stashCapacity;
+	private int pushIterations;
 
 	private IntSetIterator iterator1, iterator2;
 
@@ -77,53 +61,30 @@ public class IntSet {
 	 * growing the backing table.
 	 * @param initialCapacity If not a power of two, it is increased to the next nearest power of two. */
 	public IntSet (int initialCapacity, float loadFactor) {
-		if (loadFactor <= 0f || loadFactor >= 1f)
-			throw new IllegalArgumentException("loadFactor must be > 0 and < 1: " + loadFactor);
+		if (initialCapacity < 0) throw new IllegalArgumentException("initialCapacity must be >= 0: " + initialCapacity);
+		initialCapacity = MathUtils.nextPowerOfTwo((int)Math.ceil(initialCapacity / loadFactor));
+		if (initialCapacity > 1 << 30) throw new IllegalArgumentException("initialCapacity is too large: " + initialCapacity);
+		capacity = initialCapacity;
+
+		if (loadFactor <= 0) throw new IllegalArgumentException("loadFactor must be > 0: " + loadFactor);
 		this.loadFactor = loadFactor;
 
-		int tableSize = tableSize(initialCapacity, loadFactor);
-		threshold = (int)(tableSize * loadFactor);
-		mask = tableSize - 1;
-		shift = Long.numberOfLeadingZeros(mask);
+		threshold = (int)(capacity * loadFactor);
+		mask = capacity - 1;
+		hashShift = 31 - Integer.numberOfTrailingZeros(capacity);
+		stashCapacity = Math.max(3, (int)Math.ceil(Math.log(capacity)) * 2);
+		pushIterations = Math.max(Math.min(capacity, 8), (int)Math.sqrt(capacity) / 8);
 
-		keyTable = new int[tableSize];
+		keyTable = new int[capacity + stashCapacity];
 	}
 
 	/** Creates a new set identical to the specified set. */
 	public IntSet (IntSet set) {
-		this((int)(set.keyTable.length * set.loadFactor), set.loadFactor);
+		this((int)Math.floor(set.capacity * set.loadFactor), set.loadFactor);
+		stashSize = set.stashSize;
 		System.arraycopy(set.keyTable, 0, keyTable, 0, set.keyTable.length);
 		size = set.size;
 		hasZeroValue = set.hasZeroValue;
-	}
-
-	/** Returns an index >= 0 and <= {@link #mask} for the specified {@code item}.
-	 * <p>
-	 * The default implementation uses Fibonacci hashing on the item's {@link Object#hashCode()}: the hashcode is multiplied by a
-	 * long constant (2 to the 64th, divided by the golden ratio) then the uppermost bits are shifted into the lowest positions to
-	 * obtain an index in the desired range. Multiplication by a long may be slower than int (eg on GWT) but greatly improves
-	 * rehashing, allowing even very poor hashcodes, such as those that only differ in their upper bits, to be used without high
-	 * collision rates. Fibonacci hashing has increased collision rates when all or most hashcodes are multiples of larger
-	 * Fibonacci numbers (see <a href=
-	 * "https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/">Malte
-	 * Skarupke's blog post</a>).
-	 * <p>
-	 * This method can be overriden to customizing hashing. This may be useful eg in the unlikely event that most hashcodes are
-	 * Fibonacci numbers, if keys provide poor or incorrect hashcodes, or to simplify hashing if keys provide high quality
-	 * hashcodes and don't need Fibonacci hashing: {@code return item.hashCode() & mask;} */
-	protected int place (int item) {
-		return (int)(item * 0x9E3779B97F4A7C15L >>> shift);
-	}
-
-	/** Returns the index of the key if already present, else -(index + 1) for the next empty index. This can be overridden in this
-	 * pacakge to compare for equality differently than {@link Object#equals(Object)}. */
-	private int locateKey (int key) {
-		int[] keyTable = this.keyTable;
-		for (int i = place(key);; i = i + 1 & mask) {
-			int other = keyTable[i];
-			if (other == 0) return -(i + 1); // Empty space is available.
-			if (other == key) return i; // Same key was found.
-		}
 	}
 
 	/** Returns true if the key was not already in the set. */
@@ -134,16 +95,51 @@ public class IntSet {
 			size++;
 			return true;
 		}
-		int i = locateKey(key);
-		if (i >= 0) return false; // Existing key was found.
-		i = -(i + 1); // Empty space was found.
-		keyTable[i] = key;
-		if (++size >= threshold) resize(keyTable.length << 1);
+
+		int[] keyTable = this.keyTable;
+
+		// Check for existing keys.
+		int index1 = key & mask;
+		int key1 = keyTable[index1];
+		if (key1 == key) return false;
+
+		int index2 = hash2(key);
+		int key2 = keyTable[index2];
+		if (key2 == key) return false;
+
+		int index3 = hash3(key);
+		int key3 = keyTable[index3];
+		if (key3 == key) return false;
+
+		// Find key in the stash.
+		for (int i = capacity, n = i + stashSize; i < n; i++)
+			if (keyTable[i] == key) return false;
+
+		// Check for empty buckets.
+		if (key1 == EMPTY) {
+			keyTable[index1] = key;
+			if (size++ >= threshold) resize(capacity << 1);
+			return true;
+		}
+
+		if (key2 == EMPTY) {
+			keyTable[index2] = key;
+			if (size++ >= threshold) resize(capacity << 1);
+			return true;
+		}
+
+		if (key3 == EMPTY) {
+			keyTable[index3] = key;
+			if (size++ >= threshold) resize(capacity << 1);
+			return true;
+		}
+
+		push(key, index1, key1, index2, key2, index3, key3);
 		return true;
 	}
 
 	public void addAll (IntArray array) {
-		addAll(array.items, 0, array.size);
+		addAll(array, 0, array.size);
 	}
 
 	public void addAll (IntArray array, int offset, int length) {
@@ -164,23 +160,116 @@ public class IntSet {
 
 	public void addAll (IntSet set) {
 		ensureCapacity(set.size);
-		if (set.hasZeroValue) add(0);
-		int[] keyTable = set.keyTable;
-		for (int i = 0, n = keyTable.length; i < n; i++) {
-			int key = keyTable[i];
-			if (key != 0) add(key);
-		}
+		IntSetIterator iterator = set.iterator();
+		while (iterator.hasNext)
+			add(iterator.next());
 	}
 
-	/** Skips checks for existing keys, doesn't increment size, doesn't need to handle key 0. */
+	/** Skips checks for existing keys. */
 	private void addResize (int key) {
+		if (key == 0) {
+			hasZeroValue = true;
+			return;
+		}
+
+		// Check for empty buckets.
+		int index1 = key & mask;
+		int key1 = keyTable[index1];
+		if (key1 == EMPTY) {
+			keyTable[index1] = key;
+			if (size++ >= threshold) resize(capacity << 1);
+			return;
+		}
+
+		int index2 = hash2(key);
+		int key2 = keyTable[index2];
+		if (key2 == EMPTY) {
+			keyTable[index2] = key;
+			if (size++ >= threshold) resize(capacity << 1);
+			return;
+		}
+
+		int index3 = hash3(key);
+		int key3 = keyTable[index3];
+		if (key3 == EMPTY) {
+			keyTable[index3] = key;
+			if (size++ >= threshold) resize(capacity << 1);
+			return;
+		}
+
+		push(key, index1, key1, index2, key2, index3, key3);
+	}
+
+	private void push (int insertKey, int index1, int key1, int index2, int key2, int index3, int key3) {
 		int[] keyTable = this.keyTable;
-		for (int i = place(key);; i = (i + 1) & mask) {
-			if (keyTable[i] == 0) {
-				keyTable[i] = key;
+
+		int mask = this.mask;
+
+		// Push keys until an empty bucket is found.
+		int evictedKey;
+		int i = 0, pushIterations = this.pushIterations;
+		do {
+			// Replace the key and value for one of the hashes.
+			switch (MathUtils.random(2)) {
+			case 0:
+				evictedKey = key1;
+				keyTable[index1] = insertKey;
+				break;
+			case 1:
+				evictedKey = key2;
+				keyTable[index2] = insertKey;
+				break;
+			default:
+				evictedKey = key3;
+				keyTable[index3] = insertKey;
+				break;
+			}
+
+			// If the evicted key hashes to an empty bucket, put it there and stop.
+			index1 = evictedKey & mask;
+			key1 = keyTable[index1];
+			if (key1 == EMPTY) {
+				keyTable[index1] = evictedKey;
+				if (size++ >= threshold) resize(capacity << 1);
 				return;
 			}
+
+			index2 = hash2(evictedKey);
+			key2 = keyTable[index2];
+			if (key2 == EMPTY) {
+				keyTable[index2] = evictedKey;
+				if (size++ >= threshold) resize(capacity << 1);
+				return;
+			}
+
+			index3 = hash3(evictedKey);
+			key3 = keyTable[index3];
+			if (key3 == EMPTY) {
+				keyTable[index3] = evictedKey;
+				if (size++ >= threshold) resize(capacity << 1);
+				return;
+			}
+
+			if (++i == pushIterations) break;
+
+			insertKey = evictedKey;
+		} while (true);
+
+		addStash(evictedKey);
+	}
+
+	private void addStash (int key) {
+		if (stashSize == stashCapacity) {
+			// Too many pushes occurred and the stash is full, increase the table size.
+			resize(capacity << 1);
+			add(key);
+			return;
 		}
+		// Store key in the stash.
+		int index = capacity + stashSize;
+		keyTable[index] = key;
+		stashSize++;
+		size++;
 	}
 
 	/** Returns true if the key was removed. */
@@ -192,106 +281,154 @@ public class IntSet {
 			return true;
 		}
 
-		int i = locateKey(key);
-		if (i < 0) return false;
-		int[] keyTable = this.keyTable;
-		int mask = this.mask, next = i + 1 & mask;
-		while ((key = keyTable[next]) != 0) {
-			int placement = place(key);
-			if ((next - placement & mask) > (i - placement & mask)) {
-				keyTable[i] = key;
-				i = next;
-			}
-			next = next + 1 & mask;
+		int index = key & mask;
+		if (keyTable[index] == key) {
+			keyTable[index] = EMPTY;
+			size--;
+			return true;
 		}
-		keyTable[i] = 0;
-		size--;
-		return true;
+
+		index = hash2(key);
+		if (keyTable[index] == key) {
+			keyTable[index] = EMPTY;
+			size--;
+			return true;
+		}
+
+		index = hash3(key);
+		if (keyTable[index] == key) {
+			keyTable[index] = EMPTY;
+			size--;
+			return true;
+		}
+
+		return removeStash(key);
 	}
 
-	/** Returns true if the set has one or more items. */
-	public boolean notEmpty () {
-		return size > 0;
+	boolean removeStash (int key) {
+		int[] keyTable = this.keyTable;
+		for (int i = capacity, n = i + stashSize; i < n; i++) {
+			if (keyTable[i] == key) {
+				removeStashIndex(i);
+				size--;
+				return true;
+			}
+		}
+		return false;
 	}
 
-	/** Returns true if the set is empty. */
-	public boolean isEmpty () {
-		return size == 0;
+	void removeStashIndex (int index) {
+		// If the removed location was not last, move the last tuple to the removed location.
+		stashSize--;
+		int lastIndex = capacity + stashSize;
+		if (index < lastIndex) keyTable[index] = keyTable[lastIndex];
 	}
 
-	/** Reduces the size of the backing arrays to be the specified capacity / loadFactor, or less. If the capacity is already less,
-	 * nothing is done. If the set contains more items than the specified capacity, the next highest power of two capacity is used
-	 * instead. */
+	/** Reduces the size of the backing arrays to be the specified capacity or less. If the capacity is already less, nothing is
+	 * done. If the set contains more items than the specified capacity, the next highest power of two capacity is used instead. */
 	public void shrink (int maximumCapacity) {
 		if (maximumCapacity < 0) throw new IllegalArgumentException("maximumCapacity must be >= 0: " + maximumCapacity);
-		int tableSize = tableSize(maximumCapacity, loadFactor);
-		if (keyTable.length > tableSize) resize(tableSize);
+		if (size > maximumCapacity) maximumCapacity = size;
+		if (capacity <= maximumCapacity) return;
+		maximumCapacity = MathUtils.nextPowerOfTwo(maximumCapacity);
+		resize(maximumCapacity);
 	}
 
-	/** Clears the set and reduces the size of the backing arrays to be the specified capacity / loadFactor, if they are larger. */
+	/** Clears the set and reduces the size of the backing arrays to be the specified capacity if they are larger. */
 	public void clear (int maximumCapacity) {
-		int tableSize = tableSize(maximumCapacity, loadFactor);
-		if (keyTable.length <= tableSize) {
+		if (capacity <= maximumCapacity) {
 			clear();
 			return;
 		}
-		size = 0;
 		hasZeroValue = false;
-		resize(tableSize);
+		size = 0;
+		resize(maximumCapacity);
 	}
 
 	public void clear () {
 		if (size == 0) return;
+		int[] keyTable = this.keyTable;
+		for (int i = capacity + stashSize; i-- > 0;)
+			keyTable[i] = EMPTY;
 		size = 0;
-		Arrays.fill(keyTable, 0);
+		stashSize = 0;
 		hasZeroValue = false;
 	}
 
 	public boolean contains (int key) {
 		if (key == 0) return hasZeroValue;
-		return locateKey(key) >= 0;
+		int index = key & mask;
+		if (keyTable[index] != key) {
+			index = hash2(key);
+			if (keyTable[index] != key) {
+				index = hash3(key);
+				if (keyTable[index] != key) return containsKeyStash(key);
+			}
+		}
+		return true;
+	}
+
+	private boolean containsKeyStash (int key) {
+		int[] keyTable = this.keyTable;
+		for (int i = capacity, n = i + stashSize; i < n; i++)
+			if (keyTable[i] == key) return true;
+		return false;
 	}
 
 	public int first () {
 		if (hasZeroValue) return 0;
 		int[] keyTable = this.keyTable;
-		for (int i = 0, n = keyTable.length; i < n; i++)
-			if (keyTable[i] != 0) return keyTable[i];
+		for (int i = 0, n = capacity + stashSize; i < n; i++)
+			if (keyTable[i] != EMPTY) return keyTable[i];
 		throw new IllegalStateException("IntSet is empty.");
 	}
 
-	/** Increases the size of the backing array to accommodate the specified number of additional items / loadFactor. Useful before
-	 * adding many items to avoid multiple backing array resizes. */
+	/** Increases the size of the backing array to accommodate the specified number of additional items. Useful before adding many
+	 * items to avoid multiple backing array resizes. */
 	public void ensureCapacity (int additionalCapacity) {
-		int tableSize = tableSize(size + additionalCapacity, loadFactor);
-		if (keyTable.length < tableSize) resize(tableSize);
+		int sizeNeeded = size + additionalCapacity;
+		if (sizeNeeded >= threshold) resize(MathUtils.nextPowerOfTwo((int)Math.ceil(sizeNeeded / loadFactor)));
 	}
 
 	private void resize (int newSize) {
-		int oldCapacity = keyTable.length;
+		int oldEndIndex = capacity + stashSize;
+
+		capacity = newSize;
 		threshold = (int)(newSize * loadFactor);
 		mask = newSize - 1;
-		shift = Long.numberOfLeadingZeros(mask);
+		hashShift = 31 - Integer.numberOfTrailingZeros(newSize);
+		stashCapacity = Math.max(3, (int)Math.ceil(Math.log(newSize)) * 2);
+		pushIterations = Math.max(Math.min(newSize, 8), (int)Math.sqrt(newSize) / 8);
 
 		int[] oldKeyTable = keyTable;
 
-		keyTable = new int[newSize];
+		keyTable = new int[newSize + stashCapacity];
 
-		if (size > 0) {
-			for (int i = 0; i < oldCapacity; i++) {
+		int oldSize = size;
+		size = hasZeroValue ? 1 : 0;
+		stashSize = 0;
+		if (oldSize > 0) {
+			for (int i = 0; i < oldEndIndex; i++) {
 				int key = oldKeyTable[i];
-				if (key != 0) addResize(key);
+				if (key != EMPTY) addResize(key);
 			}
 		}
 	}
 
+	private int hash2 (int h) {
+		h *= PRIME2;
+		return (h ^ h >>> hashShift) & mask;
+	}
+
+	private int hash3 (int h) {
+		h *= PRIME3;
+		return (h ^ h >>> hashShift) & mask;
+	}
+
 	public int hashCode () {
-		int h = size;
-		int[] keyTable = this.keyTable;
-		for (int i = 0, n = keyTable.length; i < n; i++) {
-			int key = keyTable[i];
-			if (key != 0) h += key;
-		}
+		int h = 0;
+		for (int i = 0, n = capacity + stashSize; i < n; i++)
+			if (keyTable[i] != EMPTY) h += keyTable[i];
 		return h;
 	}
 
@@ -300,15 +437,14 @@ public class IntSet {
 		IntSet other = (IntSet)obj;
 		if (other.size != size) return false;
 		if (other.hasZeroValue != hasZeroValue) return false;
-		int[] keyTable = this.keyTable;
-		for (int i = 0, n = keyTable.length; i < n; i++)
-			if (keyTable[i] != 0 && !other.contains(keyTable[i])) return false;
+		for (int i = 0, n = capacity + stashSize; i < n; i++)
+			if (keyTable[i] != EMPTY && !other.contains(keyTable[i])) return false;
 		return true;
 	}
 
 	public String toString () {
 		if (size == 0) return "[]";
-		java.lang.StringBuilder buffer = new java.lang.StringBuilder(32);
+		StringBuilder buffer = new StringBuilder(32);
 		buffer.append('[');
 		int[] keyTable = this.keyTable;
 		int i = keyTable.length;
@@ -317,14 +453,14 @@ public class IntSet {
 		else {
 			while (i-- > 0) {
 				int key = keyTable[i];
-				if (key == 0) continue;
+				if (key == EMPTY) continue;
 				buffer.append(key);
 				break;
 			}
 		}
 		while (i-- > 0) {
 			int key = keyTable[i];
-			if (key == 0) continue;
+			if (key == EMPTY) continue;
 			buffer.append(", ");
 			buffer.append(key);
 		}
@@ -332,12 +468,9 @@ public class IntSet {
 		return buffer.toString();
 	}
 
-	/** Returns an iterator for the keys in the set. Remove is supported.
-	 * <p>
-	 * If {@link Collections#allocateIterators} is false, the same iterator instance is returned each time this method is called.
-	 * Use the {@link IntSetIterator} constructor for nested or multithreaded iteration. */
+	/** Returns an iterator for the keys in the set. Remove is supported. Note that the same iterator instance is returned each time
+	 * this method is called. Use the {@link IntSetIterator} constructor for nested or multithreaded iteration. */
 	public IntSetIterator iterator () {
-		if (Collections.allocateIterators) return new IntSetIterator(this);
 		if (iterator1 == null) {
 			iterator1 = new IntSetIterator(this);
 			iterator2 = new IntSetIterator(this);
@@ -361,7 +494,8 @@ public class IntSet {
 	}
 
 	static public class IntSetIterator {
-		static private final int INDEX_ILLEGAL = -2, INDEX_ZERO = -1;
+		static final int INDEX_ILLEGAL = -2;
+		static final int INDEX_ZERO = -1;
 
 		public boolean hasNext;
 
@@ -384,35 +518,27 @@ public class IntSet {
 		}
 
 		void findNextIndex () {
+			hasNext = false;
 			int[] keyTable = set.keyTable;
-			for (int n = keyTable.length; ++nextIndex < n;) {
-				if (keyTable[nextIndex] != 0) {
+			for (int n = set.capacity + set.stashSize; ++nextIndex < n;) {
+				if (keyTable[nextIndex] != EMPTY) {
 					hasNext = true;
-					return;
+					break;
 				}
 			}
-			hasNext = false;
 		}
 
 		public void remove () {
-			int i = currentIndex;
-			if (i == INDEX_ZERO && set.hasZeroValue) {
+			if (currentIndex == INDEX_ZERO && set.hasZeroValue) {
 				set.hasZeroValue = false;
-			} else if (i < 0) {
+			} else if (currentIndex < 0) {
 				throw new IllegalStateException("next must be called before remove.");
+			} else if (currentIndex >= set.capacity) {
+				set.removeStashIndex(currentIndex);
+				nextIndex = currentIndex - 1;
+				findNextIndex();
 			} else {
-				int[] keyTable = set.keyTable;
-				int mask = set.mask, next = i + 1 & mask, key;
-				while ((key = keyTable[next]) != 0) {
-					int placement = set.place(key);
-					if ((next - placement & mask) > (i - placement & mask)) {
-						keyTable[i] = key;
-						i = next;
-					}
-					next = next + 1 & mask;
-				}
-				keyTable[i] = 0;
-				if (i != currentIndex) --nextIndex;
+				set.keyTable[currentIndex] = EMPTY;
 			}
 			currentIndex = INDEX_ILLEGAL;
 			set.size--;

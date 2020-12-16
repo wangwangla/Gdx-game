@@ -56,7 +56,6 @@ public class DelaunayTriangulator {
 	 * @return triples of indices into the points that describe the triangles in clockwise order. Note the returned array is reused
 	 *         for later calls to the same method. */
 	public ShortArray computeTriangles (float[] points, int offset, int count, boolean sorted) {
-		if (count > 32767) throw new IllegalArgumentException("count must be <= " + 32767);
 		ShortArray triangles = this.triangles;
 		triangles.clear();
 		if (count < 6) return triangles;
@@ -153,10 +152,16 @@ public class DelaunayTriangulator {
 					completeArray[completeIndex] = true;
 					break;
 				case INSIDE:
-					edges.add(p1, p2, p2, p3);
-					edges.add(p3, p1);
+					edges.add(p1);
+					edges.add(p2);
+					edges.add(p2);
+					edges.add(p3);
+					edges.add(p3);
+					edges.add(p1);
 
-					triangles.removeRange(triangleIndex - 2, triangleIndex);
+					triangles.removeIndex(triangleIndex);
+					triangles.removeIndex(triangleIndex - 1);
+					triangles.removeIndex(triangleIndex - 2);
 					complete.removeIndex(completeIndex);
 					break;
 				}
@@ -314,18 +319,16 @@ public class DelaunayTriangulator {
 				originalIndices[up / 2] = tempIndex;
 			}
 		}
-		if (value > values[up]) {
-			values[lower] = values[up];
-			values[up] = value;
+		values[lower] = values[up];
+		values[up] = value;
 
-			tempValue = values[lower + 1];
-			values[lower + 1] = values[up + 1];
-			values[up + 1] = tempValue;
+		tempValue = values[lower + 1];
+		values[lower + 1] = values[up + 1];
+		values[up + 1] = tempValue;
 
-			tempIndex = originalIndices[lower / 2];
-			originalIndices[lower / 2] = originalIndices[up / 2];
-			originalIndices[up / 2] = tempIndex;
-		}
+		tempIndex = originalIndices[lower / 2];
+		originalIndices[lower / 2] = originalIndices[up / 2];
+		originalIndices[up / 2] = tempIndex;
 		return up;
 	}
 

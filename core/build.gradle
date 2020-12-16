@@ -1,23 +1,13 @@
 apply plugin: "java"
 
-sourceSets.main.java.srcDirs = [ "src/" ]
-
+sourceCompatibility = 1.8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 dependencies {
     compile project(':gdx')
-    // https://mvnrepository.com/artifact/com.dorkbox/TweenEngine
-    //    compile group: 'com.dorkbox', name: 'TweenEngine', version: '7.1'
-    //    compile "com.badlogicgames.gdx:gdx-freetype:1.9.11"
-    // https://mvnrepository.com/artifact/com.github.AlmasB/gdx-ai
-    // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-ai
-    compile 'com.badlogicgames.gdx:gdx-ai:1.8.2'
-    // https://mvnrepository.com/artifact/com.badlogicgames.ashley/ashley
-    compile 'com.badlogicgames.ashley:ashley:1.7.3'
-    // https://mvnrepository.com/artifact/com.badlogicgames.box2dlights/box2dlights
-    compile 'com.badlogicgames.box2dlights:box2dlights:1.5'
-    dependencies { compile "net.onedaybeard.artemis:artemis-odb:2.3.0" }
-    // https://mvnrepository.com/artifact/com.esotericsoftware/kryonet
-//    compile 'com.esotericsoftware:kryonet:2.22.0-RC1'
     implementation files('libs/kryo-2.23.1-SNAPSHOT-all-debug.jar')
     implementation files('libs/kryonet-9-7-14.jar')
     implementation files('libs/objenesis-2.1.jar')
+
 }
+
+sourceSets.main.java.srcDirs = [ "src/" ]

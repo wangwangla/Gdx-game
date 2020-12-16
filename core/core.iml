@@ -30,14 +30,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="gdx" exported="" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-ai-1.8.2" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: ashley-1.7.3" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: box2dlights-1.5" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: artemis-odb-2.3.0" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-box2d-1.6.2" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: gdx-1.9.8" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kryonet-9-7-14" level="project" />
     <orderEntry type="library" exported="" name="Gradle: objenesis-2.1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: core.core-1.0" level="project" />
   </component>
 </module>

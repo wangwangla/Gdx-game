@@ -63,19 +63,18 @@ public abstract class Interpolation {
 	static public final Pow pow2 = new Pow(2);
 	/** Slow, then fast. */
 	static public final PowIn pow2In = new PowIn(2);
-	static public final PowIn slowFast = pow2In;
 	/** Fast, then slow. */
 	static public final PowOut pow2Out = new PowOut(2);
+	static public final PowIn slowFast = pow2In;
+	/** Fast, then slow. */
 	static public final PowOut fastSlow = pow2Out;
 	static public final Interpolation pow2InInverse = new Interpolation() {
 		public float apply (float a) {
-			if (a < MathUtils.FLOAT_ROUNDING_ERROR) return 0;
 			return (float)Math.sqrt(a);
 		}
 	};
 	static public final Interpolation pow2OutInverse = new Interpolation() {
 		public float apply (float a) {
-			if (a < MathUtils.FLOAT_ROUNDING_ERROR) return 0;
 			return 1 - (float)Math.sqrt(-(a - 1));
 		}
 	};
@@ -110,13 +109,13 @@ public abstract class Interpolation {
 
 	static public final Interpolation sineIn = new Interpolation() {
 		public float apply (float a) {
-			return 1 - MathUtils.cos(a * MathUtils.HALF_PI);
+			return 1 - MathUtils.cos(a * MathUtils.PI / 2);
 		}
 	};
 
 	static public final Interpolation sineOut = new Interpolation() {
 		public float apply (float a) {
-			return MathUtils.sin(a * MathUtils.HALF_PI);
+			return MathUtils.sin(a * MathUtils.PI / 2);
 		}
 	};
 
@@ -415,6 +414,19 @@ public abstract class Interpolation {
 		private final float scale;
 
 		public SwingOut (float scale) {
+			this.scale = scale;
+		}
+
+		public float apply (float a) {
+			a--;
+			return a * a * ((scale + 1) * a + scale) + 1;
+		}
+	}
+
+	static public class MySwingOut extends Interpolation {
+		private final float scale;
+
+		public MySwingOut (float scale) {
 			this.scale = scale;
 		}
 

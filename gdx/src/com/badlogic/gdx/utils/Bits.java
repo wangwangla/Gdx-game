@@ -102,7 +102,11 @@ public class Bits {
 
 	/** Clears the entire bitset */
 	public void clear () {
-		Arrays.fill(bits, 0);
+		long[] bits = this.bits;
+		int length = bits.length;
+		for (int i = 0; i < length; i++) {
+			bits[i] = 0L;
+		}
 	}
 
 	/** @return the number of bits currently stored, <b>not</b> the highset set bit! */
@@ -127,11 +131,6 @@ public class Bits {
 			}
 		}
 		return 0;
-	}
-	
-	/** @return true if this bitset contains at least one bit set to true */
-	public boolean notEmpty () {
-		return !isEmpty();
 	}
 
 	/** @return true if this bitset contains no bits that are set to true */

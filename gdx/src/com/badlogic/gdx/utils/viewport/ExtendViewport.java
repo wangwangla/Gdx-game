@@ -56,6 +56,7 @@ public class ExtendViewport extends Viewport {
 		setCamera(camera);
 	}
 
+	@Override
 	public void update (int screenWidth, int screenHeight, boolean centerCamera) {
 		// Fit min size to the screen.
 		float worldWidth = minWorldWidth;

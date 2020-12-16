@@ -44,11 +44,15 @@ import com.badlogic.gdx.utils.ObjectMap;
  * 
  * <p>
  * After construction a ShaderProgram can be used to draw {@link Mesh}. To make the GPU use a specific ShaderProgram the programs
- * {@link ShaderProgram#bind()} method must be used which effectively binds the program.
+ * {@link ShaderProgram#begin()} method must be used which effectively binds the program.
  * </p>
  * 
  * <p>
  * When a ShaderProgram is bound one can set uniforms, vertex attributes and attributes as needed via the respective methods.
+ * </p>
+ * 
+ * <p>
+ * A ShaderProgram can be unbound with a call to {@link ShaderProgram#end()}
  * </p>
  * 
  * <p>
@@ -295,15 +299,13 @@ public class ShaderProgram implements Disposable {
 	}
 
 	public int fetchUniformLocation (String name, boolean pedantic) {
+		GL20 gl = Gdx.gl20;
 		// -2 == not yet cached
 		// -1 == cached but not found
 		int location;
 		if ((location = uniforms.get(name, -2)) == -2) {
-			location = Gdx.gl20.glGetUniformLocation(program, name);
-			if (location == -1 && pedantic) {
-				if (isCompiled) throw new IllegalArgumentException("No uniform with name '" + name + "' in shader");
-				throw new IllegalStateException("An attempted fetch uniform from uncompiled shader \n" + getLog());
-			}
+			location = gl.glGetUniformLocation(program, name);
+			if (location == -1 && pedantic) throw new IllegalArgumentException("no uniform with name '" + name + "' in shader");
 			uniforms.put(name, location);
 		}
 		return location;
@@ -681,21 +683,19 @@ public class ShaderProgram implements Disposable {
 		gl.glVertexAttribPointer(location, size, type, normalize, stride, offset);
 	}
 
-	/** @deprecated use {@link #bind()} instead, this method will be remove in future version */
-	@Deprecated
+	/** Makes OpenGL ES 2.0 use this vertex and fragment shader pair. When you are done with this shader you have to call
+	 * {@link ShaderProgram#end()}. */
 	public void begin () {
-		bind();
-	}
-
-	public void bind(){
 		GL20 gl = Gdx.gl20;
 		checkManaged();
 		gl.glUseProgram(program);
 	}
 
-	/** @deprecated no longer necessary, this method will be remove in future version */
-	@Deprecated
+	/** Disables this shader. Must be called when one is done with the shader. Don't mix it with dispose, that will release the
+	 * shader resources. */
 	public void end () {
+		GL20 gl = Gdx.gl20;
+		gl.glUseProgram(0);
 	}
 
 	/** Disposes all resources associated with this shader. Must be called when the shader is no longer used. */
@@ -913,10 +913,5 @@ public class ShaderProgram implements Disposable {
 	/** @return the source of the fragment shader */
 	public String getFragmentShaderSource () {
 		return fragmentShaderSource;
-	}
-
-	/** @return the handle of the shader program */
-	public int getHandle () {
-		return program;
 	}
 }

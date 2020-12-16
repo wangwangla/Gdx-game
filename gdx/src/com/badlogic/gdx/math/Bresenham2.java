@@ -76,11 +76,10 @@ public class Bresenham2 {
 		}
 		if (h < 0)
 			dy1 = -1;
-		else if (h > 0)
-			dy1 = 1;
+		else if (h > 0) dy1 = 1;
 		int longest = Math.abs(w);
 		int shortest = Math.abs(h);
-		if (longest < shortest) {
+		if (longest <= shortest) {
 			longest = Math.abs(h);
 			shortest = Math.abs(w);
 			if (h < 0)
@@ -88,16 +87,14 @@ public class Bresenham2 {
 			else if (h > 0) dy2 = 1;
 			dx2 = 0;
 		}
-		int shortest2 = shortest << 1;
-		int longest2 = longest << 1;
-		int numerator = 0;
+		int numerator = longest >> 1;
 		for (int i = 0; i <= longest; i++) {
 			GridPoint2 point = pool.obtain();
 			point.set(startX, startY);
 			output.add(point);
-			numerator += shortest2;
+			numerator += shortest;
 			if (numerator > longest) {
-				numerator -= longest2;
+				numerator -= longest;
 				startX += dx1;
 				startY += dy1;
 			} else {

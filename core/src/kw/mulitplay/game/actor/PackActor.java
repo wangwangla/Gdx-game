@@ -96,7 +96,7 @@ public class PackActor extends Group {
         fanPack.setVisible(false);
     }
 
-    public void setListener(PackActor.TachListener listener) {
+    public void setListener(TachListener listener) {
         addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {

@@ -62,7 +62,7 @@ public interface Net {
 		 * </p>
 		 * @return the result as a byte[] or null in case of a timeout or if the operation was canceled/terminated abnormally. The
 		 *         timeout is specified when creating the HTTP request, with {@link HttpRequest#setTimeOut(int)} */
-		byte[] getResult ();
+		byte[] getResult();
 
 		/** Returns the data of the HTTP response as a {@link String}.
 		 * <p>
@@ -70,25 +70,25 @@ public interface Net {
 		 * </p>
 		 * @return the result as a string or null in case of a timeout or if the operation was canceled/terminated abnormally. The
 		 *         timeout is specified when creating the HTTP request, with {@link HttpRequest#setTimeOut(int)} */
-		String getResultAsString ();
+		String getResultAsString();
 
 		/** Returns the data of the HTTP response as an {@link InputStream}. <b><br>
 		 * Warning:</b> Do not store a reference to this InputStream outside of
 		 * {@link HttpResponseListener#handleHttpResponse(HttpResponse)}. The underlying HTTP connection will be closed after that
 		 * callback finishes executing. Reading from the InputStream after it's connection has been closed will lead to exception.
 		 * @return An {@link InputStream} with the {@link HttpResponse} data. */
-		InputStream getResultAsStream ();
+		InputStream getResultAsStream();
 
 		/** Returns the {@link HttpStatus} containing the statusCode of the HTTP response. */
-		HttpStatus getStatus ();
+		HttpStatus getStatus();
 
 		/** Returns the value of the header with the given name as a {@link String}, or null if the header is not set. See
 		 * {@link HttpResponseHeader}. */
-		String getHeader (String name);
+		String getHeader(String name);
 
 		/** Returns a Map of the headers. The keys are Strings that represent the header name. Each values is a List of Strings that
 		 * represent the corresponding header values. See {@link HttpResponseHeader}. */
-		Map<String, List<String>> getHeaders ();
+		Map<String, List<String>> getHeaders();
 	}
 
 	/** Provides common HTTP methods to use when creating a {@link HttpRequest}.
@@ -109,7 +109,7 @@ public interface Net {
 
 	/** Contains getters and setters for the following parameters:
 	 * <ul>
-	 * <li><strong>httpMethod:</strong> GET or POST are most common, can use {@link Net.HttpMethods HttpMethods} for static
+	 * <li><strong>httpMethod:</strong> GET or POST are most common, can use {@link HttpMethods HttpMethods} for static
 	 * references</li>
 	 * <li><strong>url:</strong> the url</li>
 	 * <li><strong>headers:</strong> a map of the headers, setter can be called multiple times</li>
@@ -290,7 +290,7 @@ public interface Net {
 	public static interface HttpResponseListener {
 
 		/** Called when the {@link HttpRequest} has been processed and there is a {@link HttpResponse} ready. Passing data to the
-		 * rendering thread should be done using {@link Application#postRunnable(java.lang.Runnable runnable)} {@link HttpResponse}
+		 * rendering thread should be done using {@link Application#postRunnable(Runnable runnable)} {@link HttpResponse}
 		 * contains the {@link HttpStatus} and should be used to determine if the request was successful or not (see more info at
 		 * {@link HttpStatus#getStatusCode()}). For example:
 		 * 
@@ -308,14 +308,14 @@ public interface Net {
 		 * </pre>
 		 * 
 		 * @param httpResponse The {@link HttpResponse} with the HTTP response values. */
-		void handleHttpResponse (HttpResponse httpResponse);
+		void handleHttpResponse(HttpResponse httpResponse);
 
 		/** Called if the {@link HttpRequest} failed because an exception when processing the HTTP request, could be a timeout any
 		 * other reason (not an HTTP error).
 		 * @param t If the HTTP request failed because an Exception, t encapsulates it to give more information. */
-		void failed (Throwable t);
+		void failed(Throwable t);
 
-		void cancelled ();
+		void cancelled();
 	}
 
 	/** Process the specified {@link HttpRequest} and reports the {@link HttpResponse} to the specified {@link HttpResponseListener}
@@ -323,9 +323,9 @@ public interface Net {
 	 * @param httpRequest The {@link HttpRequest} to be performed.
 	 * @param httpResponseListener The {@link HttpResponseListener} to call once the HTTP response is ready to be processed. Could
 	 *           be null, in that case no listener is called. */
-	public void sendHttpRequest (HttpRequest httpRequest, HttpResponseListener httpResponseListener);
+	public void sendHttpRequest(HttpRequest httpRequest, HttpResponseListener httpResponseListener);
 
-	public void cancelHttpRequest (HttpRequest httpRequest);
+	public void cancelHttpRequest(HttpRequest httpRequest);
 
 	/** Protocol used by {@link Net#newServerSocket(Protocol, int, ServerSocketHints)} and
 	 * {@link Net#newClientSocket(Protocol, String, int, SocketHints)}.
@@ -342,7 +342,7 @@ public interface Net {
 	 *           by the system.
 	 * @return the {@link ServerSocket}
 	 * @throws GdxRuntimeException in case the socket couldn't be opened */
-	public ServerSocket newServerSocket (Protocol protocol, String hostname, int port, ServerSocketHints hints);
+	public ServerSocket newServerSocket(Protocol protocol, String hostname, int port, ServerSocketHints hints);
 
 	/** Creates a new server socket on the given port, using the given {@link Protocol}, waiting for incoming connections.
 	 * 
@@ -351,7 +351,7 @@ public interface Net {
 	 *           by the system.
 	 * @return the {@link ServerSocket}
 	 * @throws GdxRuntimeException in case the socket couldn't be opened */
-	public ServerSocket newServerSocket (Protocol protocol, int port, ServerSocketHints hints);
+	public ServerSocket newServerSocket(Protocol protocol, int port, ServerSocketHints hints);
 
 	/** Creates a new TCP client socket that connects to the given host and port.
 	 * 
@@ -360,7 +360,7 @@ public interface Net {
 	 * @param hints additional {@link SocketHints} used to create the socket. Input null to use the default setting provided by the
 	 *           system.
 	 * @return GdxRuntimeException in case the socket couldn't be opened */
-	public Socket newClientSocket (Protocol protocol, String host, int port, SocketHints hints);
+	public Socket newClientSocket(Protocol protocol, String host, int port, SocketHints hints);
 
 	/** Launches the default browser to display a URI. If the default browser is not able to handle the specified URI, the
 	 * application registered for handling URIs of the specified type is invoked. The application is determined from the protocol
@@ -370,5 +370,5 @@ public interface Net {
 	 * 
 	 * @param URI the URI to be opened.
 	 * @return false if it is known the uri was not opened, true otherwise. */
-	public boolean openURI (String URI);
+	public boolean openURI(String URI);
 }

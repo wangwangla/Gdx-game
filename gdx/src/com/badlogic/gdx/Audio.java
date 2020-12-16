@@ -46,7 +46,7 @@ public interface Audio {
 	 * @return the AudioDevice
 	 * 
 	 * @throws GdxRuntimeException in case the device could not be created */
-	public AudioDevice newAudioDevice (int samplingRate, boolean isMono);
+	public AudioDevice newAudioDevice(int samplingRate, boolean isMono);
 
 	/** Creates a new {@link AudioRecorder}. The AudioRecorder has to be disposed after it is no longer used.
 	 * 
@@ -55,7 +55,7 @@ public interface Audio {
 	 * @return the AudioRecorder
 	 * 
 	 * @throws GdxRuntimeException in case the recorder could not be created */
-	public AudioRecorder newAudioRecorder (int samplingRate, boolean isMono);
+	public AudioRecorder newAudioRecorder(int samplingRate, boolean isMono);
 
 	/** <p>
 	 * Creates a new {@link Sound} which is used to play back audio effects such as gun shots or explosions. The Sound's audio data
@@ -73,7 +73,7 @@ public interface Audio {
 	 * 
 	 * @return the new Sound
 	 * @throws GdxRuntimeException in case the sound could not be loaded */
-	public Sound newSound (FileHandle fileHandle);
+	public Sound newSound(FileHandle fileHandle);
 
 	/** Creates a new {@link Music} instance which is used to play back a music stream from a file. Currently supported formats are
 	 * WAV, MP3 and OGG. The Music instance has to be disposed if it is no longer used via the {@link Music#dispose()} method.
@@ -83,5 +83,5 @@ public interface Audio {
 	 * @param file the FileHandle
 	 * @return the new Music or null if the Music could not be loaded
 	 * @throws GdxRuntimeException in case the music could not be loaded */
-	public Music newMusic (FileHandle file);
+	public Music newMusic(FileHandle file);
 }

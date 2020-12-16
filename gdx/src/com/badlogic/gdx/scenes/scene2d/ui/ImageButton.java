@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.Scaling;
 
 /** A button with a child {@link Image} to display an image. This is useful when the button must be larger than the image and the
  * image centered on the button. If the image is the size of the button, a {@link Button} without any children can be used, where
- * the {@link Button.ButtonStyle#up}, {@link Button.ButtonStyle#down}, and {@link Button.ButtonStyle#checked} nine patches define
+ * the {@link ButtonStyle#up}, {@link ButtonStyle#down}, and {@link ButtonStyle#checked} nine patches define
  * the image.
  * @author Nathan Sweet */
 public class ImageButton extends Button {

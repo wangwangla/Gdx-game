@@ -20,5 +20,5 @@ package com.badlogic.gdx.utils;
  * @author mzechner */
 public interface Disposable {
 	/** Releases all resources of this object. */
-	public void dispose ();
+	public void dispose();
 }

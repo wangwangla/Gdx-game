@@ -30,8 +30,8 @@ public interface AudioRecorder extends Disposable {
 	 * @param samples the array to write the samples to
 	 * @param offset the offset into the array
 	 * @param numSamples the number of samples to be read */
-	public void read (short[] samples, int offset, int numSamples);
+	public void read(short[] samples, int offset, int numSamples);
 
 	/** Disposes the AudioRecorder */
-	public void dispose ();
+	public void dispose();
 }

@@ -27,5 +27,5 @@ import com.badlogic.gdx.scenes.scene2d.Group;
  * @author Nathan Sweet */
 public interface Cullable {
 	/** @param cullingArea The culling area in the child actor's coordinates. */
-	public void setCullingArea (Rectangle cullingArea);
+	public void setCullingArea(Rectangle cullingArea);
 }

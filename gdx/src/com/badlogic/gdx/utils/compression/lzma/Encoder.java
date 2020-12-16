@@ -395,7 +395,7 @@ public class Encoder {
 		_additionalOffset = 0;
 	}
 
-	int ReadMatchDistances () throws java.io.IOException {
+	int ReadMatchDistances () throws IOException {
 		int lenRes = 0;
 		_numDistancePairs = _matchFinder.GetMatches(_matchDistances);
 		if (_numDistancePairs > 0) {
@@ -408,7 +408,7 @@ public class Encoder {
 		return lenRes;
 	}
 
-	void MovePos (int num) throws java.io.IOException {
+	void MovePos (int num) throws IOException {
 		if (num > 0) {
 			_matchFinder.Skip(num);
 			_additionalOffset += num;

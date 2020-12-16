@@ -45,42 +45,42 @@ public interface TextureData {
 	}
 
 	/** @return the {@link TextureDataType} */
-	public TextureDataType getType ();
+	public TextureDataType getType();
 
 	/** @return whether the TextureData is prepared or not. */
-	public boolean isPrepared ();
+	public boolean isPrepared();
 
 	/** Prepares the TextureData for a call to {@link #consumePixmap()} or {@link #consumeCustomData(int)}. This method can be
 	 * called from a non OpenGL thread and should thus not interact with OpenGL. */
-	public void prepare ();
+	public void prepare();
 
 	/** Returns the {@link Pixmap} for upload by Texture. A call to {@link #prepare()} must precede a call to this method. Any
 	 * internal data structures created in {@link #prepare()} should be disposed of here.
 	 * 
 	 * @return the pixmap. */
-	public Pixmap consumePixmap ();
+	public Pixmap consumePixmap();
 
 	/** @return whether the caller of {@link #consumePixmap()} should dispose the Pixmap returned by {@link #consumePixmap()} */
-	public boolean disposePixmap ();
+	public boolean disposePixmap();
 
 	/** Uploads the pixel data to the OpenGL ES texture. The caller must bind an OpenGL ES texture. A call to {@link #prepare()}
 	 * must preceed a call to this method. Any internal data structures created in {@link #prepare()} should be disposed of here. */
-	public void consumeCustomData (int target);
+	public void consumeCustomData(int target);
 
 	/** @return the width of the pixel data */
-	public int getWidth ();
+	public int getWidth();
 
 	/** @return the height of the pixel data */
-	public int getHeight ();
+	public int getHeight();
 
 	/** @return the {@link Format} of the pixel data */
-	public Format getFormat ();
+	public Format getFormat();
 
 	/** @return whether to generate mipmaps or not. */
-	public boolean useMipMaps ();
+	public boolean useMipMaps();
 
 	/** @return whether this implementation can cope with a EGL context loss. */
-	public boolean isManaged ();
+	public boolean isManaged();
 
 	/** Provides static method to instantiate the right implementation (Pixmap, ETC1, KTX).
 	 * @author Vincent Bousquet */

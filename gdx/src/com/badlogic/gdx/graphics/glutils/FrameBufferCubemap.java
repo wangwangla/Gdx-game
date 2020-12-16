@@ -96,7 +96,7 @@ public class FrameBufferCubemap extends GLFrameBuffer<Cubemap> {
 	 * @param height the height of the cubemap in pixels
 	 * @param hasDepth whether to attach a depth buffer
 	 * @param hasStencil whether to attach a stencil buffer
-	 * @throws com.badlogic.gdx.utils.GdxRuntimeException in case the FrameBuffer could not be created */
+	 * @throws GdxRuntimeException in case the FrameBuffer could not be created */
 	public FrameBufferCubemap (Pixmap.Format format, int width, int height, boolean hasDepth, boolean hasStencil) {
 		FrameBufferCubemapBuilder frameBufferBuilder = new FrameBufferCubemapBuilder(width, height);
 		frameBufferBuilder.addBasicColorTextureAttachment(format);
@@ -134,7 +134,7 @@ public class FrameBufferCubemap extends GLFrameBuffer<Cubemap> {
 	}
 
 	/** Makes the frame buffer current so everything gets drawn to it, must be followed by call to either {@link #nextSide()} or
-	 * {@link #bindSide(com.badlogic.gdx.graphics.Cubemap.CubemapSide)} to activate the side to render onto. */
+	 * {@link #bindSide(Cubemap.CubemapSide)} to activate the side to render onto. */
 	@Override
 	public void bind () {
 		currentSide = -1;

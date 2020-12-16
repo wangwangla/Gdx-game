@@ -283,35 +283,35 @@ public class GestureDetector extends InputAdapter {
 	 * @author mzechner */
 	public static interface GestureListener {
 		/** @see InputProcessor#touchDown(int, int, int, int) */
-		public boolean touchDown (float x, float y, int pointer, int button);
+		public boolean touchDown(float x, float y, int pointer, int button);
 
 		/** Called when a tap occured. A tap happens if a touch went down on the screen and was lifted again without moving outside
 		 * of the tap square. The tap square is a rectangular area around the initial touch position as specified on construction
 		 * time of the {@link GestureDetector}.
 		 * @param count the number of taps. */
-		public boolean tap (float x, float y, int count, int button);
+		public boolean tap(float x, float y, int count, int button);
 
-		public boolean longPress (float x, float y);
+		public boolean longPress(float x, float y);
 
 		/** Called when the user dragged a finger over the screen and lifted it. Reports the last known velocity of the finger in
 		 * pixels per second.
 		 * @param velocityX velocity on x in seconds
 		 * @param velocityY velocity on y in seconds */
-		public boolean fling (float velocityX, float velocityY, int button);
+		public boolean fling(float velocityX, float velocityY, int button);
 
 		/** Called when the user drags a finger over the screen.
 		 * @param deltaX the difference in pixels to the last drag event on x.
 		 * @param deltaY the difference in pixels to the last drag event on y. */
-		public boolean pan (float x, float y, float deltaX, float deltaY);
+		public boolean pan(float x, float y, float deltaX, float deltaY);
 
 		/** Called when no longer panning. */
-		public boolean panStop (float x, float y, int pointer, int button);
+		public boolean panStop(float x, float y, int pointer, int button);
 
 		/** Called when the user performs a pinch zoom gesture. The original distance is the distance in pixels when the gesture
 		 * started.
 		 * @param initialDistance distance between fingers when the gesture started.
 		 * @param distance current distance between fingers. */
-		public boolean zoom (float initialDistance, float distance);
+		public boolean zoom(float initialDistance, float distance);
 
 		/** Called when a user performs a pinch zoom gesture. Reports the initial positions of the two involved fingers and their
 		 * current positions.
@@ -319,10 +319,10 @@ public class GestureDetector extends InputAdapter {
 		 * @param initialPointer2
 		 * @param pointer1
 		 * @param pointer2 */
-		public boolean pinch (Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2);
+		public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2);
 
 		/** Called when no longer pinching. */
-		public void pinchStop ();
+		public void pinchStop();
 	}
 
 	/** Derrive from this if you only want to implement a subset of {@link GestureListener}.

@@ -48,9 +48,9 @@ import com.badlogic.gdx.utils.IntSet;
  * @author mzechner */
 public class RemoteInput implements Runnable, Input {
 	public interface RemoteInputListener {
-		void onConnected ();
+		void onConnected();
 
-		void onDisconnected ();
+		void onDisconnected();
 	}
 
 	class KeyEvent {
@@ -101,14 +101,14 @@ public class RemoteInput implements Runnable, Input {
 					case TouchEvent.TOUCH_DOWN:
 						deltaX[touchEvent.pointer] = 0;
 						deltaY[touchEvent.pointer] = 0;
-						processor.touchDown(touchEvent.x, touchEvent.y, touchEvent.pointer, Input.Buttons.LEFT);
+						processor.touchDown(touchEvent.x, touchEvent.y, touchEvent.pointer, Buttons.LEFT);
 						isTouched[touchEvent.pointer] = true;
 						justTouched = true;
 						break;
 					case TouchEvent.TOUCH_UP:
 						deltaX[touchEvent.pointer] = 0;
 						deltaY[touchEvent.pointer] = 0;
-						processor.touchUp(touchEvent.x, touchEvent.y, touchEvent.pointer, Input.Buttons.LEFT);
+						processor.touchUp(touchEvent.x, touchEvent.y, touchEvent.pointer, Buttons.LEFT);
 						isTouched[touchEvent.pointer] = false;
 						break;
 					case TouchEvent.TOUCH_DRAGGED:
@@ -406,7 +406,7 @@ public class RemoteInput implements Runnable, Input {
 
 	@Override
 	public boolean isKeyPressed (int key) {
-		if (key == Input.Keys.ANY_KEY) {
+		if (key == Keys.ANY_KEY) {
 			return keyCount > 0;
 		}
 		if (key < 0 || key > 255) {
@@ -417,7 +417,7 @@ public class RemoteInput implements Runnable, Input {
 
 	@Override
 	public boolean isKeyJustPressed (int key) {
-		if (key == Input.Keys.ANY_KEY) {
+		if (key == Keys.ANY_KEY) {
 			return keyJustPressed;
 		}
 		if (key < 0 || key > 255) {

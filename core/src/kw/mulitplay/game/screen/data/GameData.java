@@ -1,14 +1,10 @@
 package kw.mulitplay.game.screen.data;
 
-import com.badlogic.gdx.utils.Array;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
 import kw.mulitplay.game.Constant;
-import kw.mulitplay.game.actor.PackActor;
 
 public class GameData{
     private String currentPlay;

@@ -28,7 +28,7 @@ public interface GLErrorListener {
 
 	/** Put your error logging code here.
 	 * @see GLInterceptor#resolveErrorNumber(int) */
-	public void onError (int error);
+	public void onError(int error);
 
 	// Basic implementations
 

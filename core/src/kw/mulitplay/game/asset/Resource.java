@@ -7,6 +7,7 @@ public class Resource {
     public HashMap<String, Integer> hashMap;
     public HashMap<Integer,String> animalData;
     public Resource() {
+        new FontResource();
         hashMap = new HashMap();
         hashMap.put("象", 1);
         hashMap.put("狮", 2);

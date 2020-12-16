@@ -25,7 +25,7 @@ import com.badlogic.gdx.utils.reflect.ArrayReflection;
  * object in the Animation is called a key frame, and multiple key frames make up the animation.
  * <p>
  * The animation's type is the class representing a frame of animation. For example, a typical 2D animation could be made
- * up of {@link com.badlogic.gdx.graphics.g2d.TextureRegion TextureRegions} and would be specified as:
+ * up of {@link TextureRegion TextureRegions} and would be specified as:
  * <p><code>Animation&lt;TextureRegion&gt; myAnimation = new Animation&lt;TextureRegion&gt;(...);</code>
  * 
  * @author mzechner */

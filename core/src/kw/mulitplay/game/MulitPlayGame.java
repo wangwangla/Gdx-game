@@ -31,6 +31,7 @@ public class MulitPlayGame extends Game {
         viewport.apply();
         Constant.height = viewport.getWorldHeight();
         Constant.width = viewport.getWorldWidth();
+        Constant.bgScale = Math.max(Constant.width / 720, Constant.height / 1280);
     }
 
     @Override

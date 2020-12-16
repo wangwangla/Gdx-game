@@ -24,10 +24,10 @@ import com.badlogic.gdx.utils.Disposable;
  * @author mzechner */
 public interface IndexData extends Disposable {
 	/** @return the number of indices currently stored in this buffer */
-	public int getNumIndices ();
+	public int getNumIndices();
 
 	/** @return the maximum number of indices this IndexBufferObject can store. */
-	public int getNumMaxIndices ();
+	public int getNumMaxIndices();
 
 	/** <p>
 	 * Sets the indices of this IndexBufferObject, discarding the old indices. The count must equal the number of indices to be
@@ -41,21 +41,21 @@ public interface IndexData extends Disposable {
 	 * @param indices the index data
 	 * @param offset the offset to start copying the data from
 	 * @param count the number of shorts to copy */
-	public void setIndices (short[] indices, int offset, int count);
+	public void setIndices(short[] indices, int offset, int count);
 
 	/** Copies the specified indices to the indices of this IndexBufferObject, discarding the old indices. Copying start at the
 	 * current {@link ShortBuffer#position()} of the specified buffer and copied the {@link ShortBuffer#remaining()} amount of
 	 * indices. This can be called in between calls to {@link #bind()} and {@link #unbind()}. The index data will be updated
 	 * instantly.
 	 * @param indices the index data to copy */
-	public void setIndices (ShortBuffer indices);
+	public void setIndices(ShortBuffer indices);
 
 	/** Update (a portion of) the indices.
 	 * @param targetOffset offset in indices buffer
 	 * @param indices the index data
 	 * @param offset the offset to start copying the data from
 	 * @param count the number of shorts to copy */
-	public void updateIndices (int targetOffset, short[] indices, int offset, int count);
+	public void updateIndices(int targetOffset, short[] indices, int offset, int count);
 
 	/** <p>
 	 * Returns the underlying ShortBuffer. If you modify the buffer contents they wil be uploaded on the call to {@link #bind()}.
@@ -63,17 +63,17 @@ public interface IndexData extends Disposable {
 	 * </p>
 	 * 
 	 * @return the underlying short buffer. */
-	public ShortBuffer getBuffer ();
+	public ShortBuffer getBuffer();
 
 	/** Binds this IndexBufferObject for rendering with glDrawElements. */
-	public void bind ();
+	public void bind();
 
 	/** Unbinds this IndexBufferObject. */
-	public void unbind ();
+	public void unbind();
 
 	/** Invalidates the IndexBufferObject so a new OpenGL buffer handle is created. Use this in case of a context loss. */
-	public void invalidate ();
+	public void invalidate();
 
 	/** Disposes this IndexDatat and all its associated OpenGL resources. */
-	public void dispose ();
+	public void dispose();
 }

@@ -24,7 +24,6 @@ public class MultClient {
         String targetIp = "127.0.0.1";
         try {
             InetAddress inetAddress = client.discoverHost(7002, 10000);
-            System.out.println(inetAddress);
             client.discoverHosts(7002,10000);
 
             client.connect(5000, "192.168.10.57", 7001,7002);
@@ -42,7 +41,6 @@ public class MultClient {
                 if (object instanceof Message) {
                     System.out.println("client message:"+((Message)object).toString());
                     listener.action((Message)object);
-
                 }
             }
 

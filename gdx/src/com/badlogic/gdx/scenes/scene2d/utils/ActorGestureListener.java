@@ -35,12 +35,12 @@ public class ActorGestureListener implements EventListener {
 	InputEvent event;
 	Actor actor, touchDownTarget;
 
-	/** @see GestureDetector#GestureDetector(com.badlogic.gdx.input.GestureDetector.GestureListener) */
+	/** @see GestureDetector#GestureDetector(GestureDetector.GestureListener) */
 	public ActorGestureListener () {
 		this(20, 0.4f, 1.1f, 0.15f);
 	}
 
-	/** @see GestureDetector#GestureDetector(float, float, float, float, com.badlogic.gdx.input.GestureDetector.GestureListener) */
+	/** @see GestureDetector#GestureDetector(float, float, float, float, GestureDetector.GestureListener) */
 	public ActorGestureListener (float halfTapSquareSize, float tapCountInterval, float longPressDuration, float maxFlingDelay) {
 		detector = new GestureDetector(halfTapSquareSize, tapCountInterval, longPressDuration, maxFlingDelay, new GestureAdapter() {
 			private final Vector2 initialPointer1 = new Vector2(), initialPointer2 = new Vector2();

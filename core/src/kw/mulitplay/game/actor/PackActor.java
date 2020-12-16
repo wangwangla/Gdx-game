@@ -53,7 +53,6 @@ public class PackActor extends Group {
 
             }
         }
-        System.out.println();
         bg = new Image(new Texture("white.png"));
         addActor(bg);
         fanPack = new Image(new Texture("pckback.png"));

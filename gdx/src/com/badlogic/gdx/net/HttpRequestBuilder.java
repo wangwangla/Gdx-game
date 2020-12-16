@@ -108,7 +108,7 @@ public class HttpRequestBuilder {
 		return this;
 	}
 
-	/** @see HttpRequest#setContent(java.io.InputStream, long) */
+	/** @see HttpRequest#setContent(InputStream, long) */
 	public HttpRequestBuilder content (InputStream contentStream, long contentLength) {
 		validate();
 		httpRequest.setContent(contentStream, contentLength);

@@ -1,14 +1,19 @@
 package kw.mulitplay.game.screen.panel;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayDeque;
 
 import kw.mulitplay.game.Constant;
 import kw.mulitplay.game.Message;
 import kw.mulitplay.game.actor.PackActor;
+import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.net.MultClient;
 import kw.mulitplay.game.net.MultServer;
 import kw.mulitplay.game.net.NetListener;
@@ -21,6 +26,8 @@ public class GamePanel extends Group {
     private PackActor down = new PackActor();
     private PackActor left = new PackActor();
     private PackActor right = new PackActor();
+    private Array<PackActor> redPackActors;
+    private Array<PackActor> blackPackActors;
 
     private Player A;
     private Player B;
@@ -67,8 +74,6 @@ public class GamePanel extends Group {
             });
             other();
         }else if (Constant.isServer == Constant.CLIENT){
-            System.out.println();
-
             MultClient client = new MultClient();
             Constant.multClient =client;
             client.setListener(new NetListener() {
@@ -82,12 +87,9 @@ public class GamePanel extends Group {
             });
         }else {
             arr = data.shuffle();
+            other();
         }
-
-//        ---->>>>>  发送消息
-
     }
-
 
     public void run(Message message){
         arr = message.getArr();
@@ -122,13 +124,21 @@ public class GamePanel extends Group {
     }
 
     private void initPacker() {
+        redPackActors = new Array<>();
+        blackPackActors = new Array<>();
         for (int x = 0; x < arr.length; x++) {
             for (int y = 0; y < arr[0].length; y++) {
                 PackActor actor = new PackActor(data,x,y);
                 actor.setListener(listener);
+                if (actor.getUseColor().equals(Color.RED)) {
+                    redPackActors.add(actor);
+                }else {
+                    blackPackActors.add(actor);
+                }
                 addActor(actor);
             }
         }
+        System.out.println(redPackActors.size+"======"+blackPackActors.size);
     }
 
     private void initTable() {
@@ -255,14 +265,19 @@ public class GamePanel extends Group {
         if(last.getOwer()!=target.getOwer()&&isValue(lastX,lastY,targetX,targetY)){
             //是否可以吃掉對方
             int num = target.getNum();
-            if ((last.getNum() == 10&&num==1)||num>=last.getNum()){
+            if (target.getNum() == 10&& last.getNum()==1){
+
+            }else if ((last.getNum() == 10&&num==1)||num>=last.getNum()){
                 target.appear();
+                removeTarget(target);
                 last.setXY(targetX,targetY);
                 arr[targetX][targetY] = arr[lastX][lastY];
                 arr[lastX][lastY] = 0;
                 last.setAnimalScale(1);
                 resetTip(true);
                 changePlayer();
+                //判断是不是可以过关
+                checkPassLevel();
                 return;
             }
             //否則   將本次的加進去
@@ -271,6 +286,44 @@ public class GamePanel extends Group {
         if (currentPlay.OWNER != target.getOwer())return;
         packActors.add(target);
         target.setAnimalScale(1.1F);
+    }
+
+
+    public void removeTarget(PackActor actor){
+        if (actor.getUseColor().equals(Color.RED)){
+            redPackActors.removeValue(actor,true);
+        }else {
+            blackPackActors.removeValue(actor,true);
+        }
+    }
+
+    private void checkPassLevel() {
+        if (redPackActors.size<=0){
+            System.out.println("black win!!!");
+            showPassLevel("black win");
+        }else if (blackPackActors.size<=0){
+            System.out.println("red win !!!");
+            showPassLevel("red win");
+        }
+        showPassLevel("red win");
+    }
+
+    public void showPassLevel(String text){
+        Group group = new Group();
+        group.setSize(Constant.width,Constant.height);
+        group.setPosition(Constant.width/2,Constant.height/2,Align.center);
+        getStage().addActor(group);
+        Image sha = new Image(new Texture("white.png"));
+        group.addActor(sha);
+        sha.setSize(group.getWidth(),group.getHeight());
+        sha.setColor(Color.valueOf("77777744"));
+        Label textLabel = new Label(text,new Label.LabelStyle(){{font = FontResource.commonfont;}});
+        group.addActor(textLabel);
+        textLabel.setAlignment(Align.center);
+        textLabel.setPosition(Constant.width/2,Constant.height/2, Align.center);
+
+        //点击任意就重新开始
+
     }
 
     private void excute(PackActor target) {
@@ -335,4 +388,6 @@ public class GamePanel extends Group {
     public interface Listener{
         void updatePlayer(Player currentPlay);
     }
+
+
 }

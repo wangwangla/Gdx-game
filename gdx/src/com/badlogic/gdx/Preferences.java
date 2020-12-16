@@ -36,47 +36,47 @@ import java.util.Map;
  * 
  * @author mzechner */
 public interface Preferences {
-	public Preferences putBoolean (String key, boolean val);
+	public Preferences putBoolean(String key, boolean val);
 
-	public Preferences putInteger (String key, int val);
+	public Preferences putInteger(String key, int val);
 
-	public Preferences putLong (String key, long val);
+	public Preferences putLong(String key, long val);
 
-	public Preferences putFloat (String key, float val);
+	public Preferences putFloat(String key, float val);
 
-	public Preferences putString (String key, String val);
+	public Preferences putString(String key, String val);
 
-	public Preferences put (Map<String, ?> vals);
+	public Preferences put(Map<String, ?> vals);
 
-	public boolean getBoolean (String key);
+	public boolean getBoolean(String key);
 
-	public int getInteger (String key);
+	public int getInteger(String key);
 
-	public long getLong (String key);
+	public long getLong(String key);
 
-	public float getFloat (String key);
+	public float getFloat(String key);
 
-	public String getString (String key);
+	public String getString(String key);
 
-	public boolean getBoolean (String key, boolean defValue);
+	public boolean getBoolean(String key, boolean defValue);
 
-	public int getInteger (String key, int defValue);
+	public int getInteger(String key, int defValue);
 
-	public long getLong (String key, long defValue);
+	public long getLong(String key, long defValue);
 
-	public float getFloat (String key, float defValue);
+	public float getFloat(String key, float defValue);
 
-	public String getString (String key, String defValue);
+	public String getString(String key, String defValue);
 
 	/** Returns a read only Map<String, Object> with all the key, objects of the preferences. */
-	public Map<String, ?> get ();
+	public Map<String, ?> get();
 
-	public boolean contains (String key);
+	public boolean contains(String key);
 
-	public void clear ();
+	public void clear();
 
-	public void remove (String key);
+	public void remove(String key);
 
 	/** Makes sure the preferences are persisted. */
-	public void flush ();
+	public void flush();
 }

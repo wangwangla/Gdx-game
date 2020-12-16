@@ -24,29 +24,29 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 public interface Drawable {
 	/** Draws this drawable at the specified bounds. The drawable should be tinted with {@link Batch#getColor()}, possibly by mixing
 	 * its own color. */
-	public void draw (Batch batch, float x, float y, float width, float height);
+	public void draw(Batch batch, float x, float y, float width, float height);
 
-	public float getLeftWidth ();
+	public float getLeftWidth();
 
-	public void setLeftWidth (float leftWidth);
+	public void setLeftWidth(float leftWidth);
 
-	public float getRightWidth ();
+	public float getRightWidth();
 
-	public void setRightWidth (float rightWidth);
+	public void setRightWidth(float rightWidth);
 
-	public float getTopHeight ();
+	public float getTopHeight();
 
-	public void setTopHeight (float topHeight);
+	public void setTopHeight(float topHeight);
 
-	public float getBottomHeight ();
+	public float getBottomHeight();
 
-	public void setBottomHeight (float bottomHeight);
+	public void setBottomHeight(float bottomHeight);
 
-	public float getMinWidth ();
+	public float getMinWidth();
 
-	public void setMinWidth (float minWidth);
+	public void setMinWidth(float minWidth);
 
-	public float getMinHeight ();
+	public float getMinHeight();
 
-	public void setMinHeight (float minHeight);
+	public void setMinHeight(float minHeight);
 }

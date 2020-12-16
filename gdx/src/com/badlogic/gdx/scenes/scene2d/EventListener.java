@@ -23,5 +23,5 @@ package com.badlogic.gdx.scenes.scene2d;
 public interface EventListener {
 	/** Try to handle the given event, if it is applicable.
 	 * @return true if the event should be considered {@link Event#handle() handled} by scene2d. */
-	public boolean handle (Event event);
+	public boolean handle(Event event);
 }

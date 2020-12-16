@@ -52,7 +52,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	 *
 	 * @param isStatic    whether the vertex data is static.
 	 * @param numVertices the maximum number of vertices
-	 * @param attributes  the {@link com.badlogic.gdx.graphics.VertexAttribute}s.
+	 * @param attributes  the {@link VertexAttribute}s.
 	 */
 	public VertexBufferObjectWithVAO (boolean isStatic, int numVertices, VertexAttribute... attributes) {
 		this(isStatic, numVertices, new VertexAttributes(attributes));

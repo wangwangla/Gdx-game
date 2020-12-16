@@ -25,7 +25,7 @@ import com.badlogic.gdx.utils.Array.ArrayIterator;
 public interface Predicate<T> {
 
 	/** @return true if the item matches the criteria and should be included in the iterator's items */
-	boolean evaluate (T arg0);
+	boolean evaluate(T arg0);
 
 	public class PredicateIterator<T> implements Iterator<T> {
 		public Iterator<T> iterator;
@@ -100,7 +100,7 @@ public interface Predicate<T> {
 		}
 
 		/** Returns an iterator. Note that the same iterator instance is returned each time this method is called. Use the
-		 * {@link Predicate.PredicateIterator} constructor for nested or multithreaded iteration. */
+		 * {@link PredicateIterator} constructor for nested or multithreaded iteration. */
 		@Override
 		public Iterator<T> iterator () {
 			if (iterator == null)

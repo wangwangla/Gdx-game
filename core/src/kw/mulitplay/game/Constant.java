@@ -25,4 +25,5 @@ public class Constant {
     public static MultClient multClient;
     public static MultServer multServer;
 
+    public static float bgScale = 1;
 }

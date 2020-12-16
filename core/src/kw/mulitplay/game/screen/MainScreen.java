@@ -1,6 +1,5 @@
 package kw.mulitplay.game.screen;
 
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -8,17 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import java.util.AbstractList;
-
 import kw.mulitplay.game.Constant;
-import kw.mulitplay.game.Message;
 import kw.mulitplay.game.asset.FontResource;
-import kw.mulitplay.game.net.MultClient;
-import kw.mulitplay.game.net.NetListener;
 import kw.mulitplay.game.screen.base.BaseScreen;
 
 public class MainScreen extends BaseScreen {
@@ -26,6 +19,9 @@ public class MainScreen extends BaseScreen {
     protected void initView() {
         Image image  = new Image(new Texture("mainbg.png"));
         stage.addActor(image);
+        image.setOrigin(Align.center);
+        image.setScale(Constant.bgScale);
+        image.setY(Constant.height/2,Align.center);
         Image button = new Image(new Texture("doubleduiyi.png"));
         stage.addActor(button);
         button.setPosition(Constant.width/2,Constant.height/2, Align.center);
@@ -44,8 +40,8 @@ public class MainScreen extends BaseScreen {
         button.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Constant.game.setScreen(new DScreen());
                 Constant.isServer = Constant.NOMAL;
+                Constant.game.setScreen(new DScreen());
             }
         });
         //one net connnect;
@@ -93,6 +89,7 @@ public class MainScreen extends BaseScreen {
                 Constant.game.setScreen(new DScreen());
             }
         });
+        tipGroup.setPosition(Constant.width/1,Constant.height/2,Align.center);
     }
 
     @Override

@@ -100,28 +100,28 @@ public abstract class GLTexture implements Disposable {
     }
 
     /**
-     * @return The {@link Texture.TextureFilter} used for minification.
+     * @return The {@link TextureFilter} used for minification.
      */
     public TextureFilter getMinFilter() {
         return minFilter;
     }
 
     /**
-     * @return The {@link Texture.TextureFilter} used for magnification.
+     * @return The {@link TextureFilter} used for magnification.
      */
     public TextureFilter getMagFilter() {
         return magFilter;
     }
 
     /**
-     * @return The {@link Texture.TextureWrap} used for horizontal (U) texture coordinates.
+     * @return The {@link TextureWrap} used for horizontal (U) texture coordinates.
      */
     public TextureWrap getUWrap() {
         return uWrap;
     }
 
     /**
-     * @return The {@link Texture.TextureWrap} used for vertical (V) texture coordinates.
+     * @return The {@link TextureWrap} used for vertical (V) texture coordinates.
      */
     public TextureWrap getVWrap() {
         return vWrap;

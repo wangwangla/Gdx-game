@@ -1116,9 +1116,9 @@ public class Json {
 	}
 
 	static public interface Serializer<T> {
-		public void write (Json json, T object, Class knownType);
+		public void write(Json json, T object, Class knownType);
 
-		public T read (Json json, JsonValue jsonData, Class type);
+		public T read(Json json, JsonValue jsonData, Class type);
 	}
 
 	static abstract public class ReadOnlySerializer<T> implements Serializer<T> {
@@ -1129,8 +1129,8 @@ public class Json {
 	}
 
 	static public interface Serializable {
-		public void write (Json json);
+		public void write(Json json);
 
-		public void read (Json json, JsonValue jsonData);
+		public void read(Json json, JsonValue jsonData);
 	}
 }

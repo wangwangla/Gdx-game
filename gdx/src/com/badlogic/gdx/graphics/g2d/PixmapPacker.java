@@ -391,10 +391,10 @@ public class PixmapPacker implements Disposable {
 	/** Choose the page and location for each rectangle.
 	 * @author Nathan Sweet */
 	static public interface PackStrategy {
-		public void sort (Array<Pixmap> images);
+		public void sort(Array<Pixmap> images);
 
 		/** Returns the page the rectangle should be placed in and modifies the specified rectangle position. */
-		public Page pack (PixmapPacker packer, String name, Rectangle rect);
+		public Page pack(PixmapPacker packer, String name, Rectangle rect);
 	}
 
 	/** Does bin packing by inserting to the right or below previously packed rectangles. This is good at packing arbitrarily sized
@@ -589,7 +589,7 @@ public class PixmapPacker implements Disposable {
 		return this.transparentColor;
 	}
 
-	/** Sets the default <code>color</code> of the whole {@link PixmapPacker.Page} when a new one created. Helps to avoid texture
+	/** Sets the default <code>color</code> of the whole {@link Page} when a new one created. Helps to avoid texture
 	 * bleeding or to highlight the page for debugging.
 	 * @see Page#Page(PixmapPacker packer) */
 	public void setTransparentColor (Color color) {

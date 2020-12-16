@@ -820,13 +820,13 @@ public class ParticleEmitter {
 		this.additive = additive;
 	}
 
-	/** @return Whether this ParticleEmitter automatically returns the {@link com.badlogic.gdx.graphics.g2d.Batch Batch}'s blend
+	/** @return Whether this ParticleEmitter automatically returns the {@link Batch Batch}'s blend
 	 *         function to the alpha-blending default (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) when done drawing. */
 	public boolean cleansUpBlendFunction () {
 		return cleansUpBlendFunction;
 	}
 
-	/** Set whether to automatically return the {@link com.badlogic.gdx.graphics.g2d.Batch Batch}'s blend function to the
+	/** Set whether to automatically return the {@link Batch Batch}'s blend function to the
 	 * alpha-blending default (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) when done drawing. Is true by default. If set to false, the
 	 * Batch's blend function is left as it was for drawing this ParticleEmitter, which prevents the Batch from being flushed
 	 * repeatedly if consecutive ParticleEmitters with the same additive or pre-multiplied alpha state are drawn in a row.

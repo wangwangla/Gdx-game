@@ -30,7 +30,7 @@ import com.badlogic.gdx.utils.ObjectMap.Entry;
 
 /** {@link AssetLoader} for {@link Skin} instances. All {@link Texture} and {@link BitmapFont} instances will be loaded as
  * dependencies. Passing a {@link SkinParameter} allows the exact name of the texture associated with the skin to be specified.
- * Otherwise the skin texture is looked up just as with a call to {@link Skin#Skin(com.badlogic.gdx.files.FileHandle)}. A
+ * Otherwise the skin texture is looked up just as with a call to {@link Skin#Skin(FileHandle)}. A
  * {@link SkinParameter} also allows named resources to be set that will be added to the skin before loading the json file,
  * meaning that they can be referenced from inside the json file itself. This is useful for dynamic resources such as a BitmapFont
  * generated through FreeTypeFontGenerator.

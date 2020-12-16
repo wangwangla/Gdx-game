@@ -776,13 +776,13 @@ public class TextField extends Widget implements Disableable {
 	/** Interface for listening to typed characters.
 	 * @author mzechner */
 	static public interface TextFieldListener {
-		public void keyTyped (TextField textField, char c);
+		public void keyTyped(TextField textField, char c);
 	}
 
 	/** Interface for filtering characters entered into the text field.
 	 * @author mzechner */
 	static public interface TextFieldFilter {
-		public boolean acceptChar (TextField textField, char c);
+		public boolean acceptChar(TextField textField, char c);
 
 		static public class DigitsOnlyFilter implements TextFieldFilter {
 			@Override
@@ -796,7 +796,7 @@ public class TextField extends Widget implements Disableable {
 	/** An interface for onscreen keyboards. Can invoke the default keyboard or render your own keyboard!
 	 * @author mzechner */
 	static public interface OnscreenKeyboard {
-		public void show (boolean visible);
+		public void show(boolean visible);
 	}
 
 	/** The default {@link OnscreenKeyboard} used by all {@link TextField} instances. Just uses

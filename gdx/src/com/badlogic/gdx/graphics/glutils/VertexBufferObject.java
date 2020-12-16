@@ -148,13 +148,13 @@ public class VertexBufferObject implements VertexData {
 		bufferChanged();
 	}
 
-	/** @return The GL enum used in the call to {@link GL20#glBufferData(int, int, java.nio.Buffer, int)}, e.g. GL_STATIC_DRAW or
+	/** @return The GL enum used in the call to {@link GL20#glBufferData(int, int, Buffer, int)}, e.g. GL_STATIC_DRAW or
 	 *         GL_DYNAMIC_DRAW */
 	protected int getUsage () {
 		return usage;
 	}
 
-	/** Set the GL enum used in the call to {@link GL20#glBufferData(int, int, java.nio.Buffer, int)}, can only be called when the
+	/** Set the GL enum used in the call to {@link GL20#glBufferData(int, int, Buffer, int)}, can only be called when the
 	 * VBO is not bound. */
 	protected void setUsage (int value) {
 		if (isBound) throw new GdxRuntimeException("Cannot change usage while VBO is bound");

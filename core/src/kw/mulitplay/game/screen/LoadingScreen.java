@@ -1,11 +1,10 @@
 package kw.mulitplay.game.screen;
 
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Align;
 
 import kw.mulitplay.game.Constant;
-import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
 
@@ -21,8 +20,10 @@ public class LoadingScreen extends BaseScreen {
     protected void initView() {
         Image image = new Image(new Texture("splash.png"));
         stage.addActor(image);
+        image.setOrigin(Align.center);
+        image.setScale(Constant.bgScale);
+        image.setY(Constant.height/2,Align.center);
         //init font resource
-        new FontResource();
         //init resource
         Constant.resource = new Resource();
     }

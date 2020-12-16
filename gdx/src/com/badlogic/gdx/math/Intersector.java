@@ -335,7 +335,7 @@ public final class Intersector {
 
 			if (intersection != null) intersection.set(ray.origin).add(v0.set(ray.direction).scl(t));
 			return true;
-		} else if (plane.testPoint(ray.origin) == Plane.PlaneSide.OnPlane) {
+		} else if (plane.testPoint(ray.origin) == PlaneSide.OnPlane) {
 			if (intersection != null) intersection.set(ray.origin);
 			return true;
 		} else
@@ -361,7 +361,7 @@ public final class Intersector {
 			float t = -(origin.dot(plane.getNormal()) + plane.getD()) / denom;
 			if (intersection != null) intersection.set(origin).add(direction.scl(t));
 			return t;
-		} else if (plane.testPoint(origin) == Plane.PlaneSide.OnPlane) {
+		} else if (plane.testPoint(origin) == PlaneSide.OnPlane) {
 			if (intersection != null) intersection.set(origin);
 			return 0;
 		}

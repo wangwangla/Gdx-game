@@ -28,7 +28,6 @@ public class LoadingScreen extends BaseScreen {
         //init font resource
         //init resource
         Constant.resource = new Resource();
-        Constant.resource.getAtlas();
     }
 
     @Override
@@ -50,6 +49,7 @@ public class LoadingScreen extends BaseScreen {
     public void enterNextScreen(float delta){
         if (out)return;
         if (assetManager.update()){
+            Constant.resource.getAtlas();
             out = true;
             enterScreen(new MainScreen());
         }

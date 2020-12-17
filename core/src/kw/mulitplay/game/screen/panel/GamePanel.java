@@ -208,6 +208,9 @@ public class GamePanel extends Group {
     }
 
     public void changePlayer(){
+        if (status == GameStatus.win) {
+            return;
+        }
         if (currentPlay == A){
             currentPlay = B;
         }else {
@@ -278,9 +281,9 @@ public class GamePanel extends Group {
                 arr[lastX][lastY] = 0;
                 last.setAnimalScale(1);
                 resetTip(true);
+                checkPassLevel();
                 changePlayer();
                 //判断是不是可以过关
-                checkPassLevel();
                 return;
             }
             //否則   將本次的加進去

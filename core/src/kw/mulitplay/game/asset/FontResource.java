@@ -28,7 +28,6 @@ public class FontResource {
     }
 
     public void getAtlas(){
-        assetManager.finishLoading();
         commonfont = assetManager.get("fonts/gamefont.fnt", BitmapFont.class);
         animalfont = assetManager.get("fonts/animal.fnt",BitmapFont.class);
         time = assetManager.get("fonts/time.fnt",BitmapFont.class);

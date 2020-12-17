@@ -7,7 +7,6 @@ import java.util.HashMap;
 import kw.mulitplay.game.Constant;
 
 public class Resource {
-
     public static TextureAtlas atlas;
     public HashMap<String, Integer> hashMap;
     public HashMap<Integer,String> animalData;

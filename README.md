@@ -229,7 +229,7 @@ static String[] atlasFileName = {"main"};
 
 
 
-![main](images/main-1607956473808.png)
+![main](images/main.png)
 
 
 
@@ -239,5 +239,5 @@ static String[] atlasFileName = {"main"};
 
 
 
-![Screenshot_2020-12-16-20-14-48-22](images/Screenshot_2020-12-16-20-14-48-22-1608120961553.png)
+![Screenshot_2020-12-16-20-14-48-22](images/game2.png)
 

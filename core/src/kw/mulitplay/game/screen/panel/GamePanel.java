@@ -85,12 +85,12 @@ public class GamePanel extends Group {
             updateListener.passLevelPass("wite player connect!",false);
             other();
         }else if (Constant.isServer == Constant.CLIENT){
+            updateListener.passLevelPass("search server!!!",false);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     MultClient client = new MultClient();
                     Constant.multClient =client;
-                    updateListener.passLevelPass("搜索服务器中!!!",false);
                     client.setAddress(new Address() {
                         @Override
                         public void address(List<InetAddress> list) {

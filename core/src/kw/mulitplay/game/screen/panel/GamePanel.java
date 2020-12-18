@@ -78,6 +78,11 @@ public class GamePanel extends Group {
                             runNetMethod(message);
                             return super.action(message);
                         }
+
+                        @Override
+                        public void start() {
+                            updateListener.tipRemove();
+                        }
                     });
                     return arrMessage;
                 }
@@ -102,17 +107,6 @@ public class GamePanel extends Group {
                             });
                         }
                     });
-
-
-//            client.setListener(new NetListener() {
-//                @Override
-//                public Message action(Message message) {
-//                    Gdx.app.postRunnable(()->{
-//                        run(message);
-//                    });
-//                    return null;
-//                }
-//            });
                 }
             }).start();
         }else {

@@ -48,6 +48,7 @@ public class MultServer{
                 array.add(connection);
                 Message action = listener.action(null);
                 sendMessage(action);
+
             }
 
             @Override

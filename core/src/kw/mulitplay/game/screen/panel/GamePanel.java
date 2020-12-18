@@ -167,15 +167,15 @@ public class GamePanel extends Group {
     }
 
     public boolean cancelTask(){
-//        if (Constant.isServer == Constant.SERVER){
-//            if (currentPlay == B){
-//                return false;
-//            }
-//        }else {
-//            if (currentPlay == A){
-//                return false;
-//            }
-//        }
+        if (Constant.isServer == Constant.SERVER){
+            if (currentPlay == B){
+                return false;
+            }
+        }else {
+            if (currentPlay == A){
+                return false;
+            }
+        }
         return true;
     }
 

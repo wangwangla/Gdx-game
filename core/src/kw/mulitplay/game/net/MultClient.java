@@ -56,7 +56,7 @@ public class MultClient {
                     Message message = (Message) object;
                     System.out.println("client message:"+message.getName());
                     listener.action((Message)object);
-                    array.add(connection);
+                    if (array.size<=0)array.add(connection);
                     listener.start();
                 }
             }

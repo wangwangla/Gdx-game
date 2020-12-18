@@ -53,7 +53,8 @@ public class MultClient {
             @Override
             public void received (Connection connection, Object object) {
                 if (object instanceof Message) {
-                    System.out.println("client message:"+((Message)object).toString());
+                    Message message = (Message) object;
+                    System.out.println("client message:"+message.getName());
                     listener.action((Message)object);
                     array.add(connection);
                     listener.start();
@@ -76,7 +77,7 @@ public class MultClient {
     public void senMessage(Message message){
         for (Connection connection : array) {
             connection.sendTCP(message);
-            System.out.println(message.getPosition().getX()+"===="+message.getPosition().getX());
+            System.out.println(message.getName());
         }
     }
 

@@ -239,6 +239,7 @@ public class GamePanel extends Group {
     };
 
     private void sendMessage(PackActor target){
+        if (target.getName()==null)return;
         Message message = new Message();
         message.setType("NULLTYPE");
         message.setName(target.getName());

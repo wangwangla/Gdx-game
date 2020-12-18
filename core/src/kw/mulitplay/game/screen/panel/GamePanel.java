@@ -102,17 +102,7 @@ public class GamePanel extends Group {
                             });
                         }
                     });
-
-
-//            client.setListener(new NetListener() {
-//                @Override
-//                public Message action(Message message) {
-//                    Gdx.app.postRunnable(()->{
-//                        run(message);
-//                    });
-//                    return null;
-//                }
-//            });
+                    client.init();
                 }
             }).start();
         }else {
@@ -121,17 +111,23 @@ public class GamePanel extends Group {
         }
     }
 
+
+    public void clientSetListener(){
+        Constant.multClient.setListener(new NetListener() {
+            @Override
+            public Message action(Message message) {
+                Gdx.app.postRunnable(()->{
+                    run(message);
+                });
+                return null;
+            }
+        });
+    }
+
     public void run(Message message){
         arr = message.getArr();
         data.setArr(arr);
         other();
-        Constant.multClient.setListener(new NetListener(){
-            @Override
-            public Message action(Message message) {
-                runNetMethod(message);
-                return super.action(message);
-            }
-        });
     }
 
     private void runNetMethod(Message message){

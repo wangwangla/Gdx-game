@@ -131,13 +131,24 @@ public class GameScreen extends BaseScreen {
     private void showIpLabel(List<InetAddress> list) {
         Table table = new Table(){{
             for (InetAddress inetAddress : list) {
-                add(new Label(inetAddress.getHostAddress(),new Label.LabelStyle(){{
+                Label label = new Label(inetAddress.getHostAddress(), new Label.LabelStyle() {{
                     font = FontResource.commonfont;
-                }}));
+                }});
+                add(label);
+                label.addListener(new ClickListener(){
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        super.clicked(event, x, y);
+                        GamePanel gamePanel = GameScreen.this.findActor("gamePanel");
+                        gamePanel.clientSetListener();
+                        Constant.multClient.connect(inetAddress.getHostAddress());
+                    }
+                });
+                row();
             }
             pack();
         }};
-        table.setPosition(Constant.width/2,Constant.height/2,Align.center);
+        table.setPosition(Constant.width/2,Constant.height*0.4F,Align.center);
         stage.addActor(table);
     }
 

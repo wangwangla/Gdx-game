@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -16,6 +17,10 @@ import kw.mulitplay.game.screen.panel.GamePanel;
 public class MultClient {
     private Client client;
     public MultClient(){
+
+    }
+
+    public void init(){
         client = new Client();
         client.start();
         Kryo kryo = client.getKryo();
@@ -31,6 +36,15 @@ public class MultClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void connect(String str){
+        try {
+            client.connect(5000, str, 7001,7002);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        initListener();
     }
 
     private Array<Connection> array = new Array<>();

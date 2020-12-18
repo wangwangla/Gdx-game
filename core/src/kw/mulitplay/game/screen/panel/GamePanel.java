@@ -78,6 +78,11 @@ public class GamePanel extends Group {
                             runNetMethod(message);
                             return super.action(message);
                         }
+
+                        @Override
+                        public void start() {
+                            updateListener.tipRemove();
+                        }
                     });
                     return arrMessage;
                 }

@@ -55,14 +55,14 @@ public class MultClient {
                 if (object instanceof Message) {
                     System.out.println("client message:"+((Message)object).toString());
                     listener.action((Message)object);
+                    array.add(connection);
+                    listener.start();
                 }
             }
 
             @Override
             public void connected(Connection connection) {
                 super.connected(connection);
-                array.add(connection);
-                listener.start();
             }
 
             @Override

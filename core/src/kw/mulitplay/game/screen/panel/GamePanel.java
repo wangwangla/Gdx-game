@@ -123,6 +123,18 @@ public class GamePanel extends Group {
             public Message action(Message message) {
                 Gdx.app.postRunnable(()->{
                     run(message);
+                    Constant.multClient.setListener(new NetListener() {
+                        @Override
+                            public Message action(Message message) {
+                                runNetMethod(message);
+                                return super.action(message);
+                            }
+
+                            @Override
+                            public void start() {
+                                updateListener.tipRemove();
+                            }
+                    });
                 });
                 return null;
             }
@@ -144,13 +156,27 @@ public class GamePanel extends Group {
     private void runNetMethod(Message message){
         String name = message.getName();
         PackActor actor = findActor(name);
-
+        System.out.println("========"+name);
+        if (actor==null)return;
         if (message.getType().equals("")){
             //得到  target
             move(actor);
         }else {
             GamePanel.this.excute(actor);
         }
+    }
+
+    public boolean cancelTask(){
+//        if (Constant.isServer == Constant.SERVER){
+//            if (currentPlay == B){
+//                return false;
+//            }
+//        }else {
+//            if (currentPlay == A){
+//                return false;
+//            }
+//        }
+        return true;
     }
 
     private void initTip() {
@@ -202,6 +228,9 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
 //            ----->>>>> 发送消息
+            if (!cancelTask()) {
+                return;
+            }
             if (Constant.isServer != Constant.NOMAL) {
                 sendMessage(target);
             }
@@ -257,6 +286,9 @@ public class GamePanel extends Group {
         @Override
         public void action(PackActor target) {
             //发送消息    ---->>>>
+            if (!cancelTask()) {
+                return;
+            }
             if (Constant.isServer != Constant.NOMAL){
                 sendMessage(target);
             }
@@ -358,6 +390,7 @@ public class GamePanel extends Group {
     }
 
     private void excute(PackActor target) {
+        cancelTask();
         resetTip(false);
         if (target.getCurrentStatus() == Constant.FANMIAN){
             fanPacker(target);

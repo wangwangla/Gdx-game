@@ -126,6 +126,12 @@ public class GamePanel extends Group {
                 });
                 return null;
             }
+
+            @Override
+            public void start() {
+                super.start();
+                updateListener.tipRemove();
+            }
         });
     }
 

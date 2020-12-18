@@ -62,6 +62,7 @@ public class MultClient {
             public void connected(Connection connection) {
                 super.connected(connection);
                 array.add(connection);
+                listener.start();
             }
 
             @Override

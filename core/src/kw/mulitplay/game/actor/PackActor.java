@@ -27,9 +27,10 @@ public class PackActor extends Group {
     private int tempY;
     private short currentStatus;
     private short ower;
-    public PackActor(){
+    public PackActor(String name){
         setSize(160,185);
         Image image = new Image(Resource.atlas.findRegion("white"));
+        setName(name);
         addActor(image);
         setVisible(false);
     }

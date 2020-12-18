@@ -30,10 +30,10 @@ import kw.mulitplay.game.screen.data.GameData;
 
 public class GamePanel extends Group {
     //上下左右提示框
-    private PackActor up = new PackActor();
-    private PackActor down = new PackActor();
-    private PackActor left = new PackActor();
-    private PackActor right = new PackActor();
+    private PackActor up = new PackActor("UP");
+    private PackActor down = new PackActor("DOWN");
+    private PackActor left = new PackActor("LEFT");
+    private PackActor right = new PackActor("RIGHT");
 
     private Array<PackActor> redPackActors;
     private Array<PackActor> blackPackActors;

@@ -41,10 +41,10 @@ public class LoadingScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
-        enterNextScreen(delta);
+        enterNextScreen();
     }
 
-    public void enterNextScreen(float delta){
+    public void enterNextScreen(){
         if (out)return;
         if (assetManager.update()){
             Constant.resource.getAtlas();

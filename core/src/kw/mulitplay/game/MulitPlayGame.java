@@ -15,16 +15,20 @@ public class MulitPlayGame extends Game {
     private Viewport viewport;
     @Override
     public void create() {
+        initInstance();
         //create viewport and as a constant
-        kw.mulitplay.game.constant.Constant.viewport = viewport = new ExtendViewport(720,1280);
+        setScreen(new LoadingScreen());
+    }
+
+    public void initInstance(){
+        Constant.viewport = viewport = new ExtendViewport(720,1280);
         // call to set value Constant.width and Constant.height
         resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         //create batch
-        kw.mulitplay.game.constant.Constant.batch = new CpuSpriteBatch();
+        Constant.batch = new CpuSpriteBatch();
         //loading
-        kw.mulitplay.game.constant.Constant.game = this;
-        kw.mulitplay.game.constant.Constant.assetManager = new AssetManager();
-        setScreen(new LoadingScreen());
+        Constant.game = this;
+        Constant.assetManager = new AssetManager();
     }
 
     @Override
@@ -32,9 +36,9 @@ public class MulitPlayGame extends Game {
         super.resize(width, height);
         viewport.update(width,height);
         viewport.apply();
-        kw.mulitplay.game.constant.Constant.height = viewport.getWorldHeight();
-        kw.mulitplay.game.constant.Constant.width = viewport.getWorldWidth();
-        kw.mulitplay.game.constant.Constant.bgScale = Math.max(kw.mulitplay.game.constant.Constant.width / 720, kw.mulitplay.game.constant.Constant.height / 1280);
+        Constant.height = viewport.getWorldHeight();
+        Constant.width = viewport.getWorldWidth();
+        Constant.bgScale = Math.max(Constant.width / 720, Constant.height / 1280);
     }
 
     @Override
@@ -47,10 +51,10 @@ public class MulitPlayGame extends Game {
     @Override
     public void dispose() {
         super.dispose();
-        if (kw.mulitplay.game.constant.Constant.multServer!=null) {
-            kw.mulitplay.game.constant.Constant.multServer.closed();
+        if (Constant.multServer!=null) {
+            Constant.multServer.closed();
         }
-        if (kw.mulitplay.game.constant.Constant.multClient!=null){
+        if (Constant.multClient!=null){
             Constant.multClient.closed();
         }
     }

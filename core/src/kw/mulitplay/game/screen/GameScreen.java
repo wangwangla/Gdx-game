@@ -118,6 +118,10 @@ public class GameScreen extends BaseScreen {
                     return;
                 }
                 shadow.remove();
+                Actor ipName = stage.getRoot().findActor("ipName");
+                if (ipName != null) {
+                    ipName.remove();
+                }
             }
 
             @Override
@@ -149,6 +153,7 @@ public class GameScreen extends BaseScreen {
             pack();
         }};
         table.setPosition(Constant.width/2,Constant.height*0.4F,Align.center);
+        table.setName("ipName");
         stage.addActor(table);
     }
 

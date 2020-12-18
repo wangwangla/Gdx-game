@@ -33,6 +33,7 @@ public class PackActor extends Group {
         setName(name);
         addActor(image);
         setVisible(false);
+        currentStatus = Constant.ZHENGMIAN;
     }
 
     public PackActor(GameData data, int x, int y){

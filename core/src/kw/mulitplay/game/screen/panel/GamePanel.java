@@ -232,18 +232,17 @@ public class GamePanel extends Group {
                 return;
             }
             if (Constant.isServer != Constant.NOMAL) {
-                sendMessage(target);
+                Message message = new Message();
+                message.setType("");
+                message.setName(target.getName());
+                message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+                sendMessage(message);
             }
             move(target);
         }
     };
 
-    private void sendMessage(PackActor target){
-        if (target.getName()==null)return;
-        Message message = new Message();
-        message.setType("NULLTYPE");
-        message.setName(target.getName());
-        message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+    private void sendMessage(Message message){
         if (Constant.isServer == Constant.SERVER){
             Constant.multServer.sendMessage(message);
         }else {
@@ -291,7 +290,11 @@ public class GamePanel extends Group {
                 return;
             }
             if (Constant.isServer != Constant.NOMAL){
-                sendMessage(target);
+                Message message = new Message();
+                message.setType("NULLTYPE");
+                message.setName(target.getName());
+                message.setPosition(new VectorPosition(target.getTempX(),target.getTempY()));
+                sendMessage(message);
             }
             excute(target);
         }

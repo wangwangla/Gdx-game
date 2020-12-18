@@ -36,7 +36,7 @@ public class MultServer{
                 if (object instanceof Message) {
                     Message object1 = (Message) object;
                     VectorPosition position = ((Message) object).getPosition();
-                    System.out.println("sever received"+position.getX()+"==="+position.getY());
+                    System.out.println("sever received"+object1.getName());
                     listener.action(object1);
                 }
             }
@@ -62,7 +62,7 @@ public class MultServer{
     public void sendMessage(Message action){
         for (Connection connection : array) {
             connection.sendTCP(action);
-            System.out.println(action.toString()+"===>发送消息！！！！！>");
+            System.out.println(action.toString()+"===>发送消息！！！！！>"+action.getName());
         }
     }
 

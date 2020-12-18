@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.constant.Constant;
 
 public abstract class BaseScreen implements Screen {
     protected Stage stage;

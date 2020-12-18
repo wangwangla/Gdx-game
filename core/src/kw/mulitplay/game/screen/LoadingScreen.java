@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 
-import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.constant.Constant;
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
 
@@ -15,7 +15,6 @@ import kw.mulitplay.game.screen.base.BaseScreen;
 public class LoadingScreen extends BaseScreen {
     private AssetManager assetManager;
     private boolean out;
-    private float time;
 
     @Override
     protected void initView() {
@@ -25,7 +24,6 @@ public class LoadingScreen extends BaseScreen {
         image.setOrigin(Align.center);
         image.setScale(Constant.bgScale);
         image.setY(Constant.height/2,Align.center);
-        //init font resource
         //init resource
         Constant.resource = new Resource();
     }

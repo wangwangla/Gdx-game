@@ -6,7 +6,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
-import kw.mulitplay.game.Message;
+import kw.mulitplay.game.net.message.Message;
 import kw.mulitplay.game.position.VectorPosition;
 
 public class MultServer{
@@ -44,6 +44,7 @@ public class MultServer{
             @Override
             public void connected(Connection connection) {
                 super.connected(connection);
+                if(array.size>0)return;   //保证只有一个连接上来
                 array.add(connection);
                 Message action = listener.action(null);
                 sendMessage(action);

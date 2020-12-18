@@ -10,7 +10,7 @@ import kw.mulitplay.game.MulitPlayGame;
 
 public class DesktopLauncher {
     public static void main(String[] arg) {
-//        texturePack();
+        texturePack();
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.title = "wrod squares";
         config.width =460; //485

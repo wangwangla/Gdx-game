@@ -1,7 +1,6 @@
 package kw.mulitplay.game.screen;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -10,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.constant.Constant;
 import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
@@ -42,7 +41,7 @@ public class MainScreen extends BaseScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Constant.isServer = Constant.NOMAL;
-                Constant.game.setScreen(new DScreen());
+                Constant.game.setScreen(new GameScreen());
             }
         });
         //one net connnect;
@@ -72,7 +71,7 @@ public class MainScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 Constant.isServer = Constant.SERVER;
-                Constant.game.setScreen(new DScreen());
+                Constant.game.setScreen(new GameScreen());
             }
         });
         stage.addActor(tipGroup);
@@ -80,17 +79,16 @@ public class MainScreen extends BaseScreen {
         tipGroup.addActor(clientLabel);
         clientLabel.setColor(Color.BLACK);
         clientLabel.setPosition(Constant.width*0.7F,tipGroup.getY(Align.center),Align.center);
-        clientLabel.setDebug(true);
         //client
         clientLabel.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 Constant.isServer = Constant.CLIENT;
-                Constant.game.setScreen(new DScreen());
+                Constant.game.setScreen(new GameScreen());
             }
         });
-        tipGroup.setPosition(Constant.width/1,Constant.height/2,Align.center);
+        tipGroup.setPosition(Constant.width/2,Constant.height/2,Align.center);
     }
 
     @Override

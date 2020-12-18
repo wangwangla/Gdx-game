@@ -1,4 +1,4 @@
-package kw.mulitplay.game;
+package kw.mulitplay.game.net.message;
 
 import kw.mulitplay.game.position.VectorPosition;
 public class Message {

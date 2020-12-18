@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.constant.Constant;
 
 public class GameData{
     private String currentPlay;

@@ -33,5 +33,6 @@
     <orderEntry type="library" exported="" name="Gradle: kryo-2.23.1-SNAPSHOT-all-debug" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kryonet-9-7-14" level="project" />
     <orderEntry type="library" exported="" name="Gradle: objenesis-2.1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: core.core-1.0" level="project" />
   </component>
 </module>

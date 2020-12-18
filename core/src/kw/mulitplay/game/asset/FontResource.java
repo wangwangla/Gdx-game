@@ -1,13 +1,11 @@
 package kw.mulitplay.game.asset;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.constant.Constant;
 
 public class FontResource {
     public static BitmapFont commonfont;

@@ -7,9 +7,11 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import java.net.InetAddress;
+import java.util.List;
 
-import kw.mulitplay.game.Message;
+import kw.mulitplay.game.net.message.Message;
 import kw.mulitplay.game.position.VectorPosition;
+import kw.mulitplay.game.screen.panel.GamePanel;
 
 public class MultClient {
     private Client client;
@@ -21,13 +23,11 @@ public class MultClient {
         kryo.register(int[].class);
         kryo.register(Message.class);
         kryo.register(VectorPosition.class);
-        String targetIp = "127.0.0.1";
         try {
-            InetAddress inetAddress = client.discoverHost(7002, 10000);
-            client.discoverHosts(7002,10000);
-
-            client.connect(5000, "192.168.10.57", 7001,7002);
-            initListener();
+            List<InetAddress> inetAddresses = client.discoverHosts(7002, 10000);
+            address.address(inetAddresses);
+//            client.connect(5000, inetAddress, 7001,7002);
+//            initListener();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,4 +74,11 @@ public class MultClient {
     public void closed(){
         client.close();
     }
+
+    private GamePanel.Address address ;
+
+    public void setAddress(GamePanel.Address address) {
+        this.address = address;
+    }
+
 }

@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 import java.util.HashMap;
 
-import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.constant.Constant;
 
 public class Resource {
     public static TextureAtlas atlas;

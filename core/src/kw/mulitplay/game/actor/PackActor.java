@@ -1,7 +1,6 @@
 package kw.mulitplay.game.actor;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -9,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import kw.mulitplay.game.Constant;
+import kw.mulitplay.game.constant.Constant;
 import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.data.GameData;
@@ -83,7 +82,7 @@ public class PackActor extends Group {
     public void setXY(int x, int y) {
         this.tempX = x;
         this.tempY = y;
-        setPosition(x*(getWidth()+5),y*(getHeight()+7));
+        setPosition(x*(getWidth()+4.5F),y*(getHeight()+7));
     }
 
     public short getCurrentStatus() {

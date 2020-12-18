@@ -1,4 +1,4 @@
-package kw.mulitplay.game;
+package kw.mulitplay.game.constant;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;

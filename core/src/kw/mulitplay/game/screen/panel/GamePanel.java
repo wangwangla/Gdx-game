@@ -1,7 +1,7 @@
 package kw.mulitplay.game.screen.panel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -9,11 +9,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
 
+import java.net.InetAddress;
+import java.sql.Connection;
 import java.util.ArrayDeque;
+import java.util.List;
 
-import kw.mulitplay.game.Constant;
-import kw.mulitplay.game.Message;
+import kw.mulitplay.game.constant.Constant;
+import kw.mulitplay.game.net.message.Message;
 import kw.mulitplay.game.actor.PackActor;
 import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.asset.Resource;
@@ -25,27 +29,27 @@ import kw.mulitplay.game.screen.Player;
 import kw.mulitplay.game.screen.data.GameData;
 
 public class GamePanel extends Group {
+    //上下左右提示框
     private PackActor up = new PackActor();
     private PackActor down = new PackActor();
     private PackActor left = new PackActor();
     private PackActor right = new PackActor();
+
     private Array<PackActor> redPackActors;
     private Array<PackActor> blackPackActors;
 
     private Player A;
     private Player B;
-
     private Player currentPlay;  //默認一個玩家開始
+
     private int arr[][];
-
     private GameData data;
-
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
 
     public GamePanel(GameData data){
         this.data = data;
         setName("gamePanel");
-        initData();   //准备数据
+        initTable();
     }
 
     private void other(){
@@ -55,16 +59,19 @@ public class GamePanel extends Group {
         controller(); //添加控制
     }
 
-    private void initData() {
-        initTable();  //初始化格子
+    public void initData() {
+        status = GameStatus.IDE;
         if (Constant.isServer == Constant.SERVER){
             arr = data.shuffle();
             MultServer server ;
             Constant.multServer = server = new MultServer();
+            Group shadowPanel = new Group();
             server.setListener(new NetListener() {
                 @Override
                 public Message action(Message message) {
+                    status = GameStatus.running;
                     Message arrMessage = new Message(arr);
+                    shadowPanel.remove();
                     Constant.multServer.setListener(new NetListener(){
                         @Override
                         public Message action(Message message) {
@@ -75,19 +82,39 @@ public class GamePanel extends Group {
                     return arrMessage;
                 }
             });
+            updateListener.passLevelPass("wite player connect!",false);
             other();
         }else if (Constant.isServer == Constant.CLIENT){
-            MultClient client = new MultClient();
-            Constant.multClient =client;
-            client.setListener(new NetListener() {
+            new Thread(new Runnable() {
                 @Override
-                public Message action(Message message) {
-                    Gdx.app.postRunnable(()->{
-                        run(message);
+                public void run() {
+                    MultClient client = new MultClient();
+                    Constant.multClient =client;
+                    updateListener.passLevelPass("搜索服务器中!!!",false);
+                    client.setAddress(new Address() {
+                        @Override
+                        public void address(List<InetAddress> list) {
+                            Gdx.app.postRunnable(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateListener.showIp(list);
+                                }
+                            });
+                        }
                     });
-                    return null;
+
+
+//            client.setListener(new NetListener() {
+//                @Override
+//                public Message action(Message message) {
+//                    Gdx.app.postRunnable(()->{
+//                        run(message);
+//                    });
+//                    return null;
+//                }
+//            });
                 }
-            });
+            }).start();
         }else {
             arr = data.shuffle();
             other();
@@ -147,7 +174,7 @@ public class GamePanel extends Group {
     private void initTable() {
         Image table = new Image(Resource.atlas.findRegion("table"));
         addActor(table);
-        table.setPosition(-4,-4);
+        table.setPosition(-6,-8);
         setSize(table.getWidth(),table.getHeight());
     }
 
@@ -306,54 +333,21 @@ public class GamePanel extends Group {
     private void checkPassLevel() {
         if (redPackActors.size<=0){
             System.out.println("black win!!!");
-            showPassLevel("black win");
+            updateListener.passLevelPass("black win",true);
         }else if (blackPackActors.size<=0){
             System.out.println("red win !!!");
-            showPassLevel("red win");
+            updateListener.passLevelPass("red win",true);
         }
     }
 
     public enum GameStatus{
-        running,win
+        running,win,IDE;
     }
 
     private GameStatus status = GameStatus.running;
 
     public GameStatus getStatus() {
         return status;
-    }
-
-    public void showPassLevel(String text){
-        status = GameStatus.win;
-        Group group = new Group();
-        group.setSize(Constant.width,Constant.height);
-        group.setPosition(Constant.width/2,Constant.height/2,Align.center);
-        getStage().addActor(group);
-        Image sha = new Image(Resource.atlas.findRegion("white"));
-        group.addActor(sha);
-        sha.setSize(group.getWidth(),group.getHeight());
-        sha.setColor(Color.valueOf("44444477"));
-        Label textLabel = new Label(text,new Label.LabelStyle(){{font = FontResource.commonfont;}});
-        group.addActor(textLabel);
-        textLabel.setAlignment(Align.center);
-        textLabel.setScale(2);
-        textLabel.setPosition(Constant.width/2,Constant.height/2, Align.center);
-
-        Label clickLabel = new Label("Click any key enter new Game",new Label.LabelStyle(){{font = FontResource.commonfont;}});
-        group.addActor(clickLabel);
-        clickLabel.setAlignment(Align.center);
-        clickLabel.setPosition(Constant.width/2,Constant.height*0.3F, Align.center);
-        //点击任意就重新开始
-        group.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                group.remove();
-                updateListener.rePlay();
-                removeListener(this);
-            }
-        });
-
     }
 
     private void excute(PackActor target) {
@@ -417,6 +411,13 @@ public class GamePanel extends Group {
 
     public interface Listener{
         void updatePlayer(Player currentPlay);
-        void rePlay();
+        void passLevelPass(String text,boolean isClick);
+        void tipRemove();
+        void showIp(List<InetAddress> list);
+    }
+
+
+    public interface Address{
+        void address(List<InetAddress> inetAddresses);
     }
 }

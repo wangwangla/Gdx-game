@@ -1,22 +1,26 @@
 package kw.mulitplay.game.screen;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import kw.mulitplay.game.Constant;
+import java.net.InetAddress;
+import java.util.List;
+
+import kw.mulitplay.game.constant.Constant;
 import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.screen.base.BaseScreen;
 import kw.mulitplay.game.screen.data.GameData;
 import kw.mulitplay.game.screen.panel.GamePanel;
 
-public class DScreen extends BaseScreen {
+public class GameScreen extends BaseScreen {
     private GameData data;
     private Label timeLabel;
     private float time = 0;
@@ -31,6 +35,12 @@ public class DScreen extends BaseScreen {
 
     @Override
     protected void initView() {
+       commonView();
+        //note : this class important
+        startGame();
+    }
+
+    public void commonView(){
         Image head = new Image(Resource.atlas.findRegion("white"));
         head.setColor(Color.valueOf("a6937c"));
         head.setSize(Constant.width,100);
@@ -61,8 +71,6 @@ public class DScreen extends BaseScreen {
         currentPlayer.setAlignment(Align.center);
         currentPlayer.setPosition(Constant.width/2,timeLabel.getY(Align.center),Align.center);
         stage.addActor(currentPlayer);
-        //note : this class important
-        startGame();
     }
 
     private void startGame(){
@@ -73,8 +81,9 @@ public class DScreen extends BaseScreen {
             gamePanel.remove();
         }
         panel = new GamePanel(data);
-        panel.setPosition(Constant.width/2,Constant.height*0.42F,Align.center);
+        panel.setPosition(Constant.width/2+3,Constant.height*0.42F,Align.center);
         stage.addActor(panel);
+        panel.toFront();
         addGamePanelListener();
     }
 
@@ -94,14 +103,42 @@ public class DScreen extends BaseScreen {
         gamePanel.setListener(new GamePanel.Listener() {
             @Override
             public void updatePlayer(Player currentPlay) {
-                DScreen.this.updatePlayer(currentPlay);
+                GameScreen.this.updatePlayer(currentPlay);
             }
 
             @Override
-            public void rePlay() {
-                startGame();
+            public void passLevelPass(String text,boolean isClick) {
+                showPassLevel(text,isClick);
+            }
+
+            @Override
+            public void tipRemove() {
+                Actor shadow = findActor("shadow");
+                if (shadow==null) {
+                    return;
+                }
+                shadow.remove();
+            }
+
+            @Override
+            public void showIp(List<InetAddress> list) {
+                showIpLabel(list);
             }
         });
+        gamePanel.initData();
+    }
+
+    private void showIpLabel(List<InetAddress> list) {
+        Table table = new Table(){{
+            for (InetAddress inetAddress : list) {
+                add(new Label(inetAddress.getHostAddress(),new Label.LabelStyle(){{
+                    font = FontResource.commonfont;
+                }}));
+            }
+            pack();
+        }};
+        table.setPosition(Constant.width/2,Constant.height/2,Align.center);
+        stage.addActor(table);
     }
 
     @Override
@@ -124,5 +161,44 @@ public class DScreen extends BaseScreen {
     private void updatePlayer(Player currentPlay){
         currentPlayer.setText(currentPlay.name);
         currentPlayer.setColor(currentPlay.color);
+    }
+
+
+    public void showPassLevel(String text,boolean addClick) {
+//        status = GamePanel.GameStatus.win;
+        Group group = new Group();
+        group.setName("shadow");
+        group.setSize(Constant.width, Constant.height);
+        group.setPosition(Constant.width / 2, Constant.height / 2, Align.center);
+        stage.addActor(group);
+        Image sha = new Image(Resource.atlas.findRegion("white"));
+        group.addActor(sha);
+        sha.setSize(group.getWidth(), group.getHeight());
+        sha.setColor(Color.valueOf("44444477"));
+        Label textLabel = new Label(text, new Label.LabelStyle() {{
+            font = FontResource.commonfont;
+        }});
+        group.addActor(textLabel);
+        textLabel.setAlignment(Align.center);
+        textLabel.setScale(2);
+        textLabel.setPosition(Constant.width / 2, Constant.height / 2, Align.center);
+        if (!addClick)return;
+        Label clickLabel = new Label("Click any key enter new Game", new Label.LabelStyle() {{
+            font = FontResource.commonfont;
+        }});
+        group.addActor(clickLabel);
+        clickLabel.setAlignment(Align.center);
+        clickLabel.setPosition(Constant.width / 2, Constant.height * 0.3F, Align.center);
+        //点击任意就重新开始
+
+        group.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                group.remove();
+                startGame();
+                group.removeListener(this);
+            }
+        });
     }
 }

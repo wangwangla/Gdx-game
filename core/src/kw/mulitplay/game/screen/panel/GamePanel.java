@@ -46,12 +46,12 @@ public class GamePanel extends Group {
     private int arr[][];
     private GameData data;
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
-//    private ComputateAI ai;
+    private ComputateAI ai;
     public GamePanel(GameData data){
         this.data = data;
         setName("gamePanel");
         initTable();
-//        ai = new ComputateAI();
+        ai = new ComputateAI();
     }
 
     private void other(){
@@ -158,7 +158,6 @@ public class GamePanel extends Group {
     private void runNetMethod(Message message){
         String name = message.getName();
         PackActor actor = findActor(name);
-        System.out.println("========"+name);
         if (actor==null)return;
         if (message.getType().equals("")){
             //得到  target
@@ -171,16 +170,13 @@ public class GamePanel extends Group {
     public boolean cancelTask(){
         if (Constant.isServer == Constant.SERVER){
             if (currentPlay == B){
-                System.out.println("AI test B canTask!!!");
                 return false;
             }
         }else if (Constant.isServer == Constant.CLIENT){
             if (currentPlay == A){
-                System.out.println("AI test A canTask!!!");
                 return false;
             }
         }
-        System.out.println("AI test pass!!!");
         return true;
     }
 
@@ -209,7 +205,6 @@ public class GamePanel extends Group {
         }
         all.addAll(redPackActors);
         all.addAll(blackPackActors);
-        System.out.println(redPackActors.size+"======"+blackPackActors.size);
     }
 
     private void initTable() {
@@ -289,16 +284,14 @@ public class GamePanel extends Group {
 //            }else {
 //                ai.excete(blackPackActors);
 //            }
-//            PackActor[] excete = ai.excete(all);
-//            if (excete.length<=1){
-//                GamePanel.this.excute(excete[0]);
-//            }else if (excete.length==2){
-//                System.out.println("=====================");
-//                System.out.println(excete[0].getNum()+"-====="+excete[1].getNum());
-//                GamePanel.this.excute(excete[0]);
-//                GamePanel.this.excute(excete[1]);
-//            }
-//            System.out.println("=============");
+
+            PackActor[] excete = ai.excete(all,currentPlay.color);
+            if (excete.length<=1){
+                GamePanel.this.excute(excete[0]);
+            }else if (excete.length==2){
+                GamePanel.this.excute(excete[0]);
+                GamePanel.this.excute(excete[1]);
+            }
         }else {
             currentPlay = A;
         }
@@ -398,10 +391,8 @@ public class GamePanel extends Group {
 
     private void checkPassLevel() {
         if (redPackActors.size<=0){
-            System.out.println("black win!!!");
             updateListener.passLevelPass("black win",true);
         }else if (blackPackActors.size<=0){
-            System.out.println("red win !!!");
             updateListener.passLevelPass("red win",true);
         }
     }
@@ -420,17 +411,13 @@ public class GamePanel extends Group {
         cancelTask();
         resetTip(false);
         if (target.getCurrentStatus() == Constant.FANMIAN){
-            System.out.println("AI test fan pai!!!");
             fanPacker(target);
         }else {
             //如果已經有選中的
             if (packActors.size()!=0){
-                System.out.println("AI test already select!!!");
                 alreadySelected(target);
             }else {
-                System.out.println("AI test not already select!!!");
                 if (currentPlay.OWNER != target.getOwer())return;
-                System.out.println("AI test add actor!!!");
                 packActors.add(target);
                 target.setAnimalScale(1.1F);
             }
@@ -468,7 +455,6 @@ public class GamePanel extends Group {
     }
 
     private void resetTip(boolean isClear){
-        System.out.println("reset tip!!!");
         if (isClear)  packActors.clear();
         up.setVisible(false);
         down.setVisible(false);

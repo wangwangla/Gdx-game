@@ -83,7 +83,6 @@ public class GameScreen extends BaseScreen {
         panel = new GamePanel(data);
         panel.setPosition(Constant.width/2+3,Constant.height*0.42F,Align.center);
         stage.addActor(panel);
-        panel.toFront();
         addGamePanelListener();
     }
 

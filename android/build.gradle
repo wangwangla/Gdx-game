@@ -91,6 +91,10 @@ idea {
 }
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public'}
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+
     maven { url 'http://deltadna.bintray.com/android' }
     mavenLocal()
     mavenCentral()

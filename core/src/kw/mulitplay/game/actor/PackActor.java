@@ -134,4 +134,11 @@ public class PackActor extends Group {
     public Color getUseColor() {
         return useColor;
     }
+
+    public boolean getStatus(){
+        if (currentStatus == Constant.FANMIAN){
+            return false;
+        }
+        return true;
+    }
 }

@@ -1,4 +1,5 @@
 package kw.mulitplay.game.screen.panel;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -9,13 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.sun.org.apache.bcel.internal.generic.ALOAD;
 
 import java.net.InetAddress;
 import java.sql.Connection;
 import java.util.ArrayDeque;
 import java.util.List;
 
+import kw.mulitplay.game.ai.ComputateAI;
 import kw.mulitplay.game.constant.Constant;
 import kw.mulitplay.game.net.message.Message;
 import kw.mulitplay.game.actor.PackActor;
@@ -45,11 +46,12 @@ public class GamePanel extends Group {
     private int arr[][];
     private GameData data;
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
-
+    private ComputateAI ai;
     public GamePanel(GameData data){
         this.data = data;
         setName("gamePanel");
         initTable();
+        ai = new ComputateAI();
     }
 
     private void other(){
@@ -167,15 +169,18 @@ public class GamePanel extends Group {
     }
 
     public boolean cancelTask(){
-//        if (Constant.isServer == Constant.SERVER){
-//            if (currentPlay == B){
-//                return false;
-//            }
-//        }else {
-//            if (currentPlay == A){
-//                return false;
-//            }
-//        }
+        if (Constant.isServer == Constant.SERVER){
+            if (currentPlay == B){
+                System.out.println("AI test B canTask!!!");
+                return false;
+            }
+        }else if (Constant.isServer == Constant.CLIENT){
+            if (currentPlay == A){
+                System.out.println("AI test A canTask!!!");
+                return false;
+            }
+        }
+        System.out.println("AI test pass!!!");
         return true;
     }
 
@@ -186,6 +191,7 @@ public class GamePanel extends Group {
         addActor(right);
     }
 
+    private Array<PackActor> all = new Array<>();
     private void initPacker() {
         redPackActors = new Array<>();
         blackPackActors = new Array<>();
@@ -201,6 +207,8 @@ public class GamePanel extends Group {
                 addActor(actor);
             }
         }
+        all.addAll(redPackActors);
+        all.addAll(blackPackActors);
         System.out.println(redPackActors.size+"======"+blackPackActors.size);
     }
 
@@ -276,6 +284,21 @@ public class GamePanel extends Group {
         }
         if (currentPlay == A){
             currentPlay = B;
+//            if (currentPlay.color == Color.RED) {
+//                ai.excete(redPackActors);
+//            }else {
+//                ai.excete(blackPackActors);
+//            }
+            PackActor[] excete = ai.excete(all);
+            if (excete.length<=1){
+                GamePanel.this.excute(excete[0]);
+            }else if (excete.length==2){
+                System.out.println("=====================");
+                System.out.println(excete[0].getNum()+"-====="+excete[1].getNum());
+                GamePanel.this.excute(excete[0]);
+                GamePanel.this.excute(excete[1]);
+            }
+            System.out.println("=============");
         }else {
             currentPlay = A;
         }
@@ -397,13 +420,17 @@ public class GamePanel extends Group {
         cancelTask();
         resetTip(false);
         if (target.getCurrentStatus() == Constant.FANMIAN){
+            System.out.println("AI test fan pai!!!");
             fanPacker(target);
         }else {
             //如果已經有選中的
             if (packActors.size()!=0){
+                System.out.println("AI test already select!!!");
                 alreadySelected(target);
             }else {
+                System.out.println("AI test not already select!!!");
                 if (currentPlay.OWNER != target.getOwer())return;
+                System.out.println("AI test add actor!!!");
                 packActors.add(target);
                 target.setAnimalScale(1.1F);
             }
@@ -421,12 +448,13 @@ public class GamePanel extends Group {
             B.OWNER = (short) (1-target.getOwer());
             B.color = target.getOtherColor();
         }
-        changePlayer();
+
         if (packActors.size()!=0){
             PackActor last = packActors.getLast();
             last.setAnimalScale(1);
             packActors.clear();
         }
+        changePlayer();
         return;
     }
 
@@ -440,6 +468,7 @@ public class GamePanel extends Group {
     }
 
     private void resetTip(boolean isClear){
+        System.out.println("reset tip!!!");
         if (isClear)  packActors.clear();
         up.setVisible(false);
         down.setVisible(false);

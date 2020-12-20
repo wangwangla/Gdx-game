@@ -46,12 +46,12 @@ public class GamePanel extends Group {
     private int arr[][];
     private GameData data;
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
-    private ComputateAI ai;
+//    private ComputateAI ai;
     public GamePanel(GameData data){
         this.data = data;
         setName("gamePanel");
         initTable();
-        ai = new ComputateAI();
+//        ai = new ComputateAI();
     }
 
     private void other(){
@@ -289,16 +289,16 @@ public class GamePanel extends Group {
 //            }else {
 //                ai.excete(blackPackActors);
 //            }
-            PackActor[] excete = ai.excete(all);
-            if (excete.length<=1){
-                GamePanel.this.excute(excete[0]);
-            }else if (excete.length==2){
-                System.out.println("=====================");
-                System.out.println(excete[0].getNum()+"-====="+excete[1].getNum());
-                GamePanel.this.excute(excete[0]);
-                GamePanel.this.excute(excete[1]);
-            }
-            System.out.println("=============");
+//            PackActor[] excete = ai.excete(all);
+//            if (excete.length<=1){
+//                GamePanel.this.excute(excete[0]);
+//            }else if (excete.length==2){
+//                System.out.println("=====================");
+//                System.out.println(excete[0].getNum()+"-====="+excete[1].getNum());
+//                GamePanel.this.excute(excete[0]);
+//                GamePanel.this.excute(excete[1]);
+//            }
+//            System.out.println("=============");
         }else {
             currentPlay = A;
         }

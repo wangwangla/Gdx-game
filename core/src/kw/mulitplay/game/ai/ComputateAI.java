@@ -22,6 +22,7 @@ public class ComputateAI {
         this.actorsTemp = actors;
         //找出符合当前用户的牌
         this.list = select(actors);
+
         PackActor actor = null;
         HashMap<PackActor, Array<PackActor>> meKill = canKill(list);
         HashMap<PackActor, Array<PackActor>> killMe = canKillMe(list);
@@ -58,7 +59,7 @@ public class ComputateAI {
     public PackActor fanpai(){
         Array<PackActor> actors = new Array<>();
         System.out.println("===========");
-        for (PackActor actor : list) {
+        for (PackActor actor : actorsTemp) {
             if (actor.getCurrentStatus()!= Constant.ZHENGMIAN) {
                 actors.add(actor);
                 System.out.println(actor.getCurrentStatus()+"===="+actor.getNum());
@@ -177,29 +178,29 @@ public class ComputateAI {
     //根据位置获取元素
     public Array<PackActor> getArrayActor(PackActor actor){
         Array<PackActor> actors = new Array<>();
-        for (PackActor actorTemp : list) {
+        for (PackActor actorTemp :actorsTemp) {
             if (actorTemp.getStatus()){
                 if (comparePosition(
-                        actor.getTempX(),
-                        actor.getTempY(),
+                        actorTemp.getTempX(),
+                        actorTemp.getTempY(),
                         actor.getTempX()-1,
                         actor.getTempY())) {
                     actors.add(actorTemp);
                 }else if (comparePosition(
-                        actor.getTempX(),
-                        actor.getTempY(),
+                        actorTemp.getTempX(),
+                        actorTemp.getTempY(),
                         actor.getTempX()+1,
                         actor.getTempY())) {
                     actors.add(actorTemp);
                 }else if (comparePosition(
-                        actor.getTempX(),
-                        actor.getTempY(),
+                        actorTemp.getTempX(),
+                        actorTemp.getTempY(),
                         actor.getTempX(),
                         actor.getTempY()-1)) {
                     actors.add(actorTemp);
                 }else if (comparePosition(
-                        actor.getTempX(),
-                        actor.getTempY(),
+                        actorTemp.getTempX(),
+                        actorTemp.getTempY(),
                         actor.getTempX(),
                         actor.getTempY()+1)) {
                     actors.add(actorTemp);

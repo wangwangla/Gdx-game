@@ -34,6 +34,10 @@ public class MulitPlayGame extends Game {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+        resizeViewport(width,height);
+    }
+
+    private void resizeViewport(int width,int height) {
         viewport.update(width,height);
         viewport.apply();
         Constant.height = viewport.getWorldHeight();

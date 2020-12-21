@@ -171,7 +171,7 @@ public class GamePanel extends Group {
             if (currentPlay == B){
                 return false;
             }
-        }else {
+        }else if (Constant.isServer == Constant.CLIENT){
             if (currentPlay == A){
                 return false;
             }

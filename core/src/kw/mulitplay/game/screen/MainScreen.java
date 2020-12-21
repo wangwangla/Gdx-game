@@ -32,6 +32,8 @@ public class MainScreen extends BaseScreen {
         button2.setName("button2");
     }
 
+
+
     //this method only add listener to button
     @Override
     protected void initListener() {

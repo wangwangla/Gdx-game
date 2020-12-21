@@ -1,5 +1,6 @@
 package kw.mulitplay.game.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -133,6 +134,15 @@ public class GameScreen extends BaseScreen {
             @Override
             public void showIp(List<InetAddress> list) {
                 showIpLabel(list);
+            }
+
+            @Override
+            public void touch(boolean flag) {
+                if (flag) {
+                    Gdx.input.setInputProcessor(stage);
+                }else {
+                    Gdx.input.setInputProcessor(null);
+                }
             }
         });
         gamePanel.initData();

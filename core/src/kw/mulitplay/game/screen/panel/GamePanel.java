@@ -3,6 +3,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 
@@ -304,6 +305,11 @@ public class GamePanel extends Group {
         }
         if (currentPlay == A){
             currentPlay = B;
+            updateListener.touch(false);
+            addAction(Actions.delay(1, Actions.run(()->{
+                AI();
+                updateListener.touch(true);
+            })));
         }else {
             currentPlay = A;
         }
@@ -486,6 +492,7 @@ public class GamePanel extends Group {
         void passLevelPass(String text,boolean isClick);
         void tipRemove();
         void showIp(List<InetAddress> list);
+        void touch(boolean b);
     }
 
 

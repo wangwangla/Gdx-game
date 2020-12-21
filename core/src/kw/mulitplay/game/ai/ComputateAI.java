@@ -37,11 +37,11 @@ public class ComputateAI {
             System.out.println(packActor.toString());
         }
         System.out.println("=======i can kill==========");
-        System.out.println("=======i be killed==========");
-        for (PackActor packActor : killMe.keySet()) {
-            System.out.println(packActor.toString());
-        }
-        System.out.println("=======i be killed==========");
+//        System.out.println("=======i be killed==========");
+//        for (PackActor packActor : killMe.keySet()) {
+//            System.out.println(packActor.toString());
+//        }
+//        System.out.println("=======i be killed==========");
         if (isAlreadyFan().size > 0) {
             //i can kill target
             if (meKill.size() > 0) {
@@ -79,6 +79,10 @@ public class ComputateAI {
                     //可以逃跑
                     System.out.println("wo ke pao!!!!");
                 }else {
+                    //可以随机翻牌
+
+                    //可以找所有可以移动的进行移动
+
                     System.out.println("pao bu l!!!!");
                     allMove(list);
                 }
@@ -86,6 +90,7 @@ public class ComputateAI {
                 if (this.actorsAll.size>0){
                     //可以逃跑
                     System.out.println("chenggong!!!!");
+                    return null;
                 }else {
                     System.out.println("wandan!!!!");
                     allMove(list);
@@ -323,6 +328,7 @@ public class ComputateAI {
     public Array<PackActor> getArrayActor(PackActor actor){
         Array<PackActor> actors = new Array<>();
         for (PackActor actorTemp :actorsTemp) {
+            if (!actorTemp.isLive())continue;
             if (actorTemp.getStatus()){
                 if (comparePosition(
                         actorTemp.getTempX(),

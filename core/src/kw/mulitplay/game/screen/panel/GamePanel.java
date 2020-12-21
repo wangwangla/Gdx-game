@@ -1,4 +1,5 @@
 package kw.mulitplay.game.screen.panel;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -9,13 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.sun.org.apache.bcel.internal.generic.ALOAD;
 
 import java.net.InetAddress;
 import java.sql.Connection;
 import java.util.ArrayDeque;
 import java.util.List;
 
+import kw.mulitplay.game.ai.ComputateAI;
 import kw.mulitplay.game.constant.Constant;
 import kw.mulitplay.game.net.message.Message;
 import kw.mulitplay.game.actor.PackActor;
@@ -45,11 +46,12 @@ public class GamePanel extends Group {
     private int arr[][];
     private GameData data;
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
-
+    private ComputateAI ai;
     public GamePanel(GameData data){
         this.data = data;
         setName("gamePanel");
         initTable();
+        ai = new ComputateAI();
     }
 
     private void other(){
@@ -156,7 +158,6 @@ public class GamePanel extends Group {
     private void runNetMethod(Message message){
         String name = message.getName();
         PackActor actor = findActor(name);
-        System.out.println("========"+name);
         if (actor==null)return;
         if (message.getType().equals("")){
             //得到  target
@@ -186,6 +187,7 @@ public class GamePanel extends Group {
         addActor(right);
     }
 
+    private Array<PackActor> all = new Array<>();
     private void initPacker() {
         redPackActors = new Array<>();
         blackPackActors = new Array<>();
@@ -201,7 +203,8 @@ public class GamePanel extends Group {
                 addActor(actor);
             }
         }
-        System.out.println(redPackActors.size+"======"+blackPackActors.size);
+        all.addAll(redPackActors);
+        all.addAll(blackPackActors);
     }
 
     private void initTable() {
@@ -276,6 +279,19 @@ public class GamePanel extends Group {
         }
         if (currentPlay == A){
             currentPlay = B;
+//            if (currentPlay.color == Color.RED) {
+//                ai.excete(redPackActors);
+//            }else {
+//                ai.excete(blackPackActors);
+//            }
+
+            PackActor[] excete = ai.excete(all,currentPlay.color);
+            if (excete.length<=1){
+                GamePanel.this.excute(excete[0]);
+            }else if (excete.length==2){
+                GamePanel.this.excute(excete[0]);
+                GamePanel.this.excute(excete[1]);
+            }
         }else {
             currentPlay = A;
         }
@@ -375,10 +391,8 @@ public class GamePanel extends Group {
 
     private void checkPassLevel() {
         if (redPackActors.size<=0){
-            System.out.println("black win!!!");
             updateListener.passLevelPass("black win",true);
         }else if (blackPackActors.size<=0){
-            System.out.println("red win !!!");
             updateListener.passLevelPass("red win",true);
         }
     }
@@ -421,12 +435,13 @@ public class GamePanel extends Group {
             B.OWNER = (short) (1-target.getOwer());
             B.color = target.getOtherColor();
         }
-        changePlayer();
+
         if (packActors.size()!=0){
             PackActor last = packActors.getLast();
             last.setAnimalScale(1);
             packActors.clear();
         }
+        changePlayer();
         return;
     }
 

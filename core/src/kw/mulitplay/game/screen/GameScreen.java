@@ -84,6 +84,13 @@ public class GameScreen extends BaseScreen {
         panel.setPosition(Constant.width/2+3,Constant.height*0.42F,Align.center);
         stage.addActor(panel);
         addGamePanelListener();
+        timeLabel.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                panel.AI();
+            }
+        });
     }
 
     @Override

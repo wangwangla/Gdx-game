@@ -35,7 +35,7 @@ public class GamePanel extends Group {
 
     private Player A;
     private Player B;
-    private Player currentPlay;  //默認一個玩家開始
+    private Player currentPlay;  //默認一個玩家開始Nu
 
     private int arr[][];
     private GameData data;
@@ -58,59 +58,61 @@ public class GamePanel extends Group {
 
     public void initData() {
         status = GameStatus.IDE;
-        if (Constant.isServer == Constant.SERVER){
-            arr = data.shuffle();
-            MultServer server ;
-            Constant.multServer = server = new MultServer();
-            Group shadowPanel = new Group();
-            server.setListener(new NetListener() {
-                @Override
-                public Message action(Message message) {
-                    status = GameStatus.running;
-                    Message arrMessage = new Message(arr);
-                    shadowPanel.remove();
-                    Constant.multServer.setListener(new NetListener(){
-                        @Override
-                        public Message action(Message message) {
-                            runNetMethod(message);
-                            return super.action(message);
-                        }
-
-                        @Override
-                        public void start() {
-                            updateListener.tipRemove();
-                        }
-                    });
-                    return arrMessage;
-                }
-            });
-            updateListener.passLevelPass("wite player connect!",false);
-            other();
-        }else if (Constant.isServer == Constant.CLIENT){
-            updateListener.passLevelPass("search server!!!",false);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    MultClient client = new MultClient();
-                    Constant.multClient =client;
-                    client.setAddress(new Address() {
-                        @Override
-                        public void address(List<InetAddress> list) {
-                            Gdx.app.postRunnable(new Runnable() {
-                                @Override
-                                public void run() {
-                                    updateListener.showIp(list);
-                                }
-                            });
-                        }
-                    });
-                    client.init();
-                }
-            }).start();
-        }else {
-            arr = data.shuffle();
-            other();
-        }
+//        if (Constant.isServer == Constant.SERVER){
+//            arr = data.shuffle();
+//            MultServer server ;
+//            Constant.multServer = server = new MultServer();
+//            Group shadowPanel = new Group();
+//            server.setListener(new NetListener() {
+//                @Override
+//                public Message action(Message message) {
+//                    status = GameStatus.running;
+//                    Message arrMessage = new Message(arr);
+//                    shadowPanel.remove();
+//                    Constant.multServer.setListener(new NetListener(){
+//                        @Override
+//                        public Message action(Message message) {
+//                            runNetMethod(message);
+//                            return super.action(message);
+//                        }
+//
+//                        @Override
+//                        public void start() {
+//                            updateListener.tipRemove();
+//                        }
+//                    });
+//                    return arrMessage;
+//                }
+//            });
+//            updateListener.passLevelPass("wite player connect!",false);
+//            other();
+//        }else if (Constant.isServer == Constant.CLIENT){
+//            updateListener.passLevelPass("search server!!!",false);
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    MultClient client = new MultClient();
+//                    Constant.multClient =client;
+//                    client.setAddress(new Address() {
+//                        @Override
+//                        public void address(List<InetAddress> list) {
+//                            Gdx.app.postRunnable(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    updateListener.showIp(list);
+//                                }
+//                            });
+//                        }
+//                    });
+//                    client.init();
+//                }
+//            }).start();
+//        }else {
+//            arr = data.shuffle();
+//            other();
+//        }
+        arr = data.shuffle();
+        other();
     }
 
     public void clientSetListener(){
@@ -274,6 +276,7 @@ public class GamePanel extends Group {
     }
 
     private void changePosition(PackActor target) {
+        System.out.println("setPosition");
         PackActor actor = target;
         int tempY = actor.getTempY();
         int tempX = actor.getTempX();
@@ -301,30 +304,6 @@ public class GamePanel extends Group {
         }
         if (currentPlay == A){
             currentPlay = B;
-//            if (currentPlay.color == Color.RED) {
-//                ai.excete(redPackActors);
-//            }else {
-//                ai.excete(blackPackActors);
-//            }
-
-            PackActor[] excete = ai.excete(all,currentPlay.color,arr);
-
-            if (excete==null){
-                HashMap<PackActor, Array<Vector2>> canMove = ai.getCanMove();
-                Array<PackActor> actors = ai.getActorsAll();
-                PackActor packActor = actors.get(0);
-                Array<Vector2> vector2s = canMove.get(packActor);
-                System.out.println("====>>>>>>"+packActor.toString());
-                Vector2 vector2 = vector2s.get(0);
-                changePosition(packActor,(int) vector2.x,(int) vector2.y);
-            }else if(excete.length<=1){
-                System.out.println(excete[0].toString());
-                GamePanel.this.excute(excete[0]);
-            }else if (excete.length==2){
-                GamePanel.this.excute(excete[0]);
-                GamePanel.this.excute(excete[1]);
-                System.out.println(excete[0].toString()+">>>>>"+excete[1].toString());
-            }
         }else {
             currentPlay = A;
         }
@@ -427,6 +406,26 @@ public class GamePanel extends Group {
             updateListener.passLevelPass("black win",true);
         }else if (blackPackActors.size<=0){
             updateListener.passLevelPass("red win",true);
+        }
+    }
+
+    public void AI() {
+        PackActor[] excete = ai.excete(all,currentPlay.color,arr);
+        if (excete==null){
+            HashMap<PackActor, Array<Vector2>> canMove = ai.getCanMove();
+            Array<PackActor> actors = ai.getActorsAll();
+            PackActor packActor = actors.get(0);
+            Array<Vector2> vector2s = canMove.get(packActor);
+            System.out.println("====>>>>>>"+packActor.toString());
+            Vector2 vector2 = vector2s.get(0);
+            changePosition(packActor,(int) vector2.x,(int) vector2.y);
+        }else if(excete.length<=1){
+            System.out.println(excete[0].toString());
+            GamePanel.this.excute(excete[0]);
+        }else if (excete.length==2){
+            GamePanel.this.excute(excete[0]);
+            GamePanel.this.excute(excete[1]);
+            System.out.println(excete[0].toString()+">>>>>"+excete[1].toString());
         }
     }
 

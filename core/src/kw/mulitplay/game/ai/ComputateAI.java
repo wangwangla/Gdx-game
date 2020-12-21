@@ -256,6 +256,7 @@ public class ComputateAI {
     private Array<PackActor> selectCanKill(Array<PackActor> actors) {
         Array<PackActor> actors1 = new Array<>();
         for (PackActor actor : actors) {
+            if (!actor.isLive())continue;
             if (actor.getStatus()) {
                 actors1.add(actor);
             }

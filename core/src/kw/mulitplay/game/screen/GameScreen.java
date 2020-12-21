@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -115,6 +116,8 @@ public class GameScreen extends BaseScreen {
 
             @Override
             public void passLevelPass(String text,boolean isClick) {
+                Constant.multServer.closed();
+                Constant.multClient.closed();
                 showPassLevel(text,isClick);
             }
 

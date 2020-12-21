@@ -59,61 +59,59 @@ public class GamePanel extends Group {
 
     public void initData() {
         status = GameStatus.IDE;
-//        if (Constant.isServer == Constant.SERVER){
-//            arr = data.shuffle();
-//            MultServer server ;
-//            Constant.multServer = server = new MultServer();
-//            Group shadowPanel = new Group();
-//            server.setListener(new NetListener() {
-//                @Override
-//                public Message action(Message message) {
-//                    status = GameStatus.running;
-//                    Message arrMessage = new Message(arr);
-//                    shadowPanel.remove();
-//                    Constant.multServer.setListener(new NetListener(){
-//                        @Override
-//                        public Message action(Message message) {
-//                            runNetMethod(message);
-//                            return super.action(message);
-//                        }
-//
-//                        @Override
-//                        public void start() {
-//                            updateListener.tipRemove();
-//                        }
-//                    });
-//                    return arrMessage;
-//                }
-//            });
-//            updateListener.passLevelPass("wite player connect!",false);
-//            other();
-//        }else if (Constant.isServer == Constant.CLIENT){
-//            updateListener.passLevelPass("search server!!!",false);
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    MultClient client = new MultClient();
-//                    Constant.multClient =client;
-//                    client.setAddress(new Address() {
-//                        @Override
-//                        public void address(List<InetAddress> list) {
-//                            Gdx.app.postRunnable(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    updateListener.showIp(list);
-//                                }
-//                            });
-//                        }
-//                    });
-//                    client.init();
-//                }
-//            }).start();
-//        }else {
-//            arr = data.shuffle();
-//            other();
-//        }
-        arr = data.shuffle();
-        other();
+        if (Constant.isServer == Constant.SERVER){
+            arr = data.shuffle();
+            MultServer server ;
+            Constant.multServer = server = new MultServer();
+            Group shadowPanel = new Group();
+            server.setListener(new NetListener() {
+                @Override
+                public Message action(Message message) {
+                    status = GameStatus.running;
+                    Message arrMessage = new Message(arr);
+                    shadowPanel.remove();
+                    Constant.multServer.setListener(new NetListener(){
+                        @Override
+                        public Message action(Message message) {
+                            runNetMethod(message);
+                            return super.action(message);
+                        }
+
+                        @Override
+                        public void start() {
+                            updateListener.tipRemove();
+                        }
+                    });
+                    return arrMessage;
+                }
+            });
+            updateListener.passLevelPass("wite player connect!",false);
+            other();
+        }else if (Constant.isServer == Constant.CLIENT){
+            updateListener.passLevelPass("search server!!!",false);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    MultClient client = new MultClient();
+                    Constant.multClient =client;
+                    client.setAddress(new Address() {
+                        @Override
+                        public void address(List<InetAddress> list) {
+                            Gdx.app.postRunnable(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateListener.showIp(list);
+                                }
+                            });
+                        }
+                    });
+                    client.init();
+                }
+            }).start();
+        }else {
+            arr = data.shuffle();
+            other();
+        }
     }
 
     public void clientSetListener(){

@@ -2,11 +2,9 @@ package kw.mulitplay.game.ai;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.HashMap;
-import java.util.Set;
 
 import kw.mulitplay.game.actor.PackActor;
 import kw.mulitplay.game.constant.Constant;
@@ -17,11 +15,12 @@ public class ComputateAI {
     private int status;
     private Array<PackActor> actorsTemp;
     private Color computerColor;
+    private int arr[][];
     public ComputateAI(){
 
     }
 
-    public PackActor[] excete(Array<PackActor> actors, Color color) {
+    public PackActor[] excete(Array<PackActor> actors, Color color, int[][] arr) {
         //use color
         this.computerColor = color;
         //所有的
@@ -30,8 +29,19 @@ public class ComputateAI {
         this.list = select(actors);
         PackActor actor = null;
         //kill me
+        this.arr = arr;
         HashMap<PackActor, Array<PackActor>> meKill = canKill(list);
         HashMap<PackActor, Array<PackActor>> killMe = canKillMe(list);
+        System.out.println("=======i can kill==========");
+        for (PackActor packActor : meKill.keySet()) {
+            System.out.println(packActor.toString());
+        }
+        System.out.println("=======i can kill==========");
+        System.out.println("=======i be killed==========");
+        for (PackActor packActor : killMe.keySet()) {
+            System.out.println(packActor.toString());
+        }
+        System.out.println("=======i be killed==========");
         if (isAlreadyFan().size > 0) {
             //i can kill target
             if (meKill.size() > 0) {
@@ -40,7 +50,16 @@ public class ComputateAI {
                 Array<PackActor> packActorArray = meKill.get(srcActor);
                 PackActor targetActor = packActorArray.get(getRandom(packActorArray.size));
                 return new PackActor[]{srcActor, targetActor};
-            }
+            }else if (killMe.size()>0){
+                for (PackActor packActor : killMe.keySet()) {
+                    System.out.println(packActor.toString()+":who");
+                    Array<PackActor> packActors = killMe.get(packActor);
+                    for (PackActor packActor1 : packActors) {
+                        System.out.println("===>>>");
+                        System.out.println(packActor1.toString());
+                        System.out.println("===>>>");
+                    }
+                }
 //            else if (meKill.size()>0) {
 
                 //i kil
@@ -51,9 +70,43 @@ public class ComputateAI {
 //                System.out.println("AI---- test be killss!!!");
 //                return new PackActor[]{actor1,actor2};
 //            } else {
+//                actor = fanpai();
+//                return new PackActor[]{actor};
+//
+                weiMove(killMe);
+                //
+                if (this.actorsAll.size>0){
+                    //可以逃跑
+                    System.out.println("wo ke pao!!!!");
+                }else {
+                    System.out.println("pao bu l!!!!");
+                    allMove(list);
+                }
+
+                if (this.actorsAll.size>0){
+                    //可以逃跑
+                    System.out.println("chenggong!!!!");
+                }else {
+                    System.out.println("wandan!!!!");
+                    allMove(list);
+                }
                 actor = fanpai();
-                return new PackActor[]{actor};
-//            }
+                if (actor == null){
+                    System.out.println(this.actorsAll.size+"GG");
+                }else {
+                    return new PackActor[]{actor};
+                }
+                return null;
+            }else {
+                actor = fanpai();
+                if (actor == null){
+                    System.out.println(this.actorsAll.size+"GG");
+                }else {
+                    return new PackActor[]{actor};
+                }
+                allMove(list);
+                return null;
+            }
         } else {
             //随机翻拍
             actor = fanpai();
@@ -61,37 +114,59 @@ public class ComputateAI {
         }
     }
 
-    public void move(HashMap<PackActor, Array<PackActor>> killMe){
+
+
+    public void weiMove(HashMap<PackActor, Array<PackActor>> killMe){
         //可以跑的路线
         //.有危险
         for (PackActor packActor : killMe.keySet()) {
-//            canMove(packActor);
+            canMove(packActor,arr);
         }
     }
 
+    public void allMove(Array<PackActor> list){
+        for (PackActor packActor : list) {
+            if (!canKillMeArray.contains(packActor,true)) {
+                canMove(packActor, arr);
+            }
+        }
+    }
+
+    public HashMap<PackActor, Array<Vector2>> getCanMove() {
+        return canMove;
+    }
+
+    public Array<PackActor> getActorsAll() {
+        return actorsAll;
+    }
+
     private HashMap<PackActor,Array<Vector2>> canMove = new HashMap<PackActor,Array<Vector2>>();
-    private Array<PackActor> actors = new Array<>();
+    private Array<PackActor> actorsAll = new Array<>();
     private void canMove(PackActor packActor,int arr[][]) {
         canMove.clear();
-        actors.clear();
+        actorsAll.clear();
         int tempX = packActor.getTempX();
         int tempY = packActor.getTempY();
         Array<Vector2> temp = new Array<>();
         if (tempX-1>0&&arr[tempX-1][tempY] == 0) {
             temp.add(new Vector2(tempX-1,tempY));
         }
-        if (tempX+1<arr[0].length&&arr[tempX+1][tempY] == 0) {
+        if (tempX+1<arr.length&&arr[tempX+1][tempY] == 0) {
             temp.add(new Vector2(tempX+1,tempY));
         }
         if ((tempY-1)>=0&&arr[tempX][tempY-1] == 0) {
             temp.add(new Vector2(tempX,tempY-1));
         }
-        if ((tempY+1)<arr.length&&arr[tempX][tempY+1] == 0) {
+        if ((tempY+1)<arr[0].length&&arr[tempX][tempY+1] == 0) {
             temp.add(new Vector2(tempX,tempY+1));
         }
         if (temp.size>0) {
             canMove.put(packActor, temp);
-            actors.add(packActor);
+            actorsAll.add(packActor);
+            System.out.println("=======sad==========");
+            System.out.println(packActor.toString()+"======="+temp.size);
+            System.out.println("=======sad==========");
+
         }
     }
 
@@ -105,10 +180,12 @@ public class ComputateAI {
 
         try{
             int random = getRandom(actors.size);
+            if (actors.size<=0)return null;
             PackActor actor = actors.get(random);
             return actor;
         }catch (Exception e){
             System.out.println("=============errpr");
+            allMove(list);
         }
         return null;
     }
@@ -188,7 +265,6 @@ public class ComputateAI {
 
     // 有没有可以杀我的
     public HashMap<PackActor,Array<PackActor>> canKillMe(Array<PackActor> actors){
-        //我自己的牌
         Array<PackActor> valueActor = selectCanKill(actors);
         canKillMeArray = new Array<>();
         HashMap<PackActor,Array<PackActor>> hashMap = new HashMap<>();
@@ -200,7 +276,7 @@ public class ComputateAI {
                 Array<PackActor> packActorArray = new Array<>();
                 //可以进行kill
                 for (PackActor packActor : arrayActor) {
-                    if (kill(packActor,actor)) {
+                    if (kill1(packActor,actor)) {
                         packActorArray.add(packActor);
                     }
                 }
@@ -223,6 +299,18 @@ public class ComputateAI {
         }else if ((last.getNum() == 10&&num==1)||num>=last.getNum()){
             return true;
         }
+        return false;
+    }
+
+    public boolean kill1(PackActor last,PackActor target){
+        if (!target.isLive())return false;
+        int num = target.getNum();
+        if (last.getUseColor() != target.getUseColor())
+            if (target.getNum() == 10&& last.getNum()==1){
+
+            }else if ((last.getNum() == 10&&num==1)||num>=last.getNum()){
+                return true;
+            }
         return false;
     }
 

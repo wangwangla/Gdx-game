@@ -1,26 +1,20 @@
 package kw.mulitplay.game.screen.panel;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import java.net.InetAddress;
-import java.sql.Connection;
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.List;
 
 import kw.mulitplay.game.ai.ComputateAI;
 import kw.mulitplay.game.constant.Constant;
 import kw.mulitplay.game.net.message.Message;
 import kw.mulitplay.game.actor.PackActor;
-import kw.mulitplay.game.asset.FontResource;
 import kw.mulitplay.game.asset.Resource;
 import kw.mulitplay.game.net.MultClient;
 import kw.mulitplay.game.net.MultServer;
@@ -47,6 +41,7 @@ public class GamePanel extends Group {
     private GameData data;
     private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
     private ComputateAI ai;
+
     public GamePanel(GameData data){
         this.data = data;
         setName("gamePanel");
@@ -259,6 +254,25 @@ public class GamePanel extends Group {
         }
     }
 
+    private void excute(PackActor target) {
+        cancelTask();
+        resetTip(false);
+        if (target.getCurrentStatus() == Constant.FANMIAN){
+            fanPacker(target);
+        }else {
+            //如果已經有選中的
+            if (packActors.size()!=0){
+                alreadySelected(target);
+            }else {
+                if (currentPlay.OWNER != target.getOwer())return;
+                packActors.add(target);
+                target.setAnimalScale(1.1F);
+            }
+            //提示
+            tip();
+        }
+    }
+
     private void changePosition(PackActor target) {
         PackActor actor = target;
         int tempY = actor.getTempY();
@@ -269,6 +283,15 @@ public class GamePanel extends Group {
         last.setXY(tempX,tempY);
         last.setAnimalScale(1);
         target.setVisible(false);
+        changePlayer();
+    }
+
+    private void changePosition(PackActor last,int tempX,int tempY) {
+        packActors.clear();
+        arr[last.getTempX()][last.getTempY()] = 0;
+        arr[tempX][tempY] = Integer.parseInt(last.getName());
+        last.setXY(tempX,tempY);
+        last.setAnimalScale(1);
         changePlayer();
     }
 
@@ -284,10 +307,19 @@ public class GamePanel extends Group {
 //                ai.excete(blackPackActors);
 //            }
 
-            PackActor[] excete = ai.excete(all,currentPlay.color);
-            if (excete.length<=1){
-                GamePanel.this.excute(excete[0]);
+            PackActor[] excete = ai.excete(all,currentPlay.color,arr);
+
+            if (excete==null){
+                HashMap<PackActor, Array<Vector2>> canMove = ai.getCanMove();
+                Array<PackActor> actors = ai.getActorsAll();
+                PackActor packActor = actors.get(0);
+                Array<Vector2> vector2s = canMove.get(packActor);
+                System.out.println("====>>>>>>"+packActor.toString());
+                Vector2 vector2 = vector2s.get(0);
+                changePosition(packActor,(int) vector2.x,(int) vector2.y);
+            }else if(excete.length<=1){
                 System.out.println(excete[0].toString());
+                GamePanel.this.excute(excete[0]);
             }else if (excete.length==2){
                 GamePanel.this.excute(excete[0]);
                 GamePanel.this.excute(excete[1]);
@@ -406,25 +438,6 @@ public class GamePanel extends Group {
 
     public GameStatus getStatus() {
         return status;
-    }
-
-    private void excute(PackActor target) {
-        cancelTask();
-        resetTip(false);
-        if (target.getCurrentStatus() == Constant.FANMIAN){
-            fanPacker(target);
-        }else {
-            //如果已經有選中的
-            if (packActors.size()!=0){
-                alreadySelected(target);
-            }else {
-                if (currentPlay.OWNER != target.getOwer())return;
-                packActors.add(target);
-                target.setAnimalScale(1.1F);
-            }
-            //提示
-            tip();
-        }
     }
 
     private void fanPacker(PackActor target) {

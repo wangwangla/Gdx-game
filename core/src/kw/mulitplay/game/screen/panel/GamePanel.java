@@ -118,7 +118,6 @@ public class GamePanel extends Group {
         }
     }
 
-
     public void clientSetListener(){
         Constant.multClient.setListener(new NetListener() {
             @Override

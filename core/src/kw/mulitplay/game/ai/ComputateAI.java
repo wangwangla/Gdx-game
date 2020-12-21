@@ -35,7 +35,7 @@ public class ComputateAI {
         if (isAlreadyFan().size > 0) {
             //i can kill target
             if (meKill.size() > 0) {
-                //kill me
+                //kill me    吃身边的可
                 PackActor srcActor = canKillArray.get(getRandom(meKill.size()));
                 Array<PackActor> packActorArray = meKill.get(srcActor);
                 PackActor targetActor = packActorArray.get(getRandom(packActorArray.size));

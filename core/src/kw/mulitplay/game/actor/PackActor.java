@@ -27,6 +27,7 @@ public class PackActor extends Group {
     private int tempY;
     private short currentStatus;
     private short ower;
+    private boolean live = true;
     public PackActor(String name){
         setSize(160,185);
         Image image = new Image(Resource.atlas.findRegion("white"));
@@ -62,6 +63,7 @@ public class PackActor extends Group {
         fanPack.setPosition(getWidth()/2,getHeight()/2, Align.center);
         zhengPack = new Image(Resource.atlas.findRegion(num+""));
         addActor(zhengPack);
+        zhengPack.setVisible(false);
         zhengPack.setPosition(getWidth(),0,Align.bottomRight);
         name = data.getAnimalData().get(num);
         animalLabel = new Label(name,new Label.LabelStyle(){{font = FontResource.animalfont;}});
@@ -69,7 +71,7 @@ public class PackActor extends Group {
         animalLabel.setColor(useColor);
         animalLabel.setAlignment(Align.center);
         animalLabel.setPosition(20,getHeight()-20, Align.center);
-        addActor(fanPack);
+//        addActor(fanPack);
         setXY(x,y);
     }
 
@@ -94,6 +96,7 @@ public class PackActor extends Group {
     public void open(){
         currentStatus = Constant.ZHENGMIAN;
         fanPack.setVisible(false);
+        zhengPack.setVisible(true);
     }
 
     public void setListener(TachListener listener) {
@@ -111,6 +114,7 @@ public class PackActor extends Group {
     }
 
     public void appear(){
+        live = false;
         remove();
     }
 
@@ -140,5 +144,14 @@ public class PackActor extends Group {
             return false;
         }
         return true;
+    }
+
+    public boolean isLive() {
+        return live;
+    }
+
+    @Override
+    public String toString() {
+        return "name:"+getName()+",x:"+tempX+",y:"+tempY;
     }
 }

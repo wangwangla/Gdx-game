@@ -288,9 +288,11 @@ public class GamePanel extends Group {
             PackActor[] excete = ai.excete(all,currentPlay.color);
             if (excete.length<=1){
                 GamePanel.this.excute(excete[0]);
+                System.out.println(excete[0].toString());
             }else if (excete.length==2){
                 GamePanel.this.excute(excete[0]);
                 GamePanel.this.excute(excete[1]);
+                System.out.println(excete[0].toString()+">>>>>"+excete[1].toString());
             }
         }else {
             currentPlay = A;

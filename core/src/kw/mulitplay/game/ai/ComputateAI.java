@@ -1,6 +1,7 @@
 package kw.mulitplay.game.ai;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.utils.Array;
 
@@ -28,34 +29,69 @@ public class ComputateAI {
         //找出符合当前用户的牌
         this.list = select(actors);
         PackActor actor = null;
-
+        //kill me
         HashMap<PackActor, Array<PackActor>> meKill = canKill(list);
         HashMap<PackActor, Array<PackActor>> killMe = canKillMe(list);
         if (isAlreadyFan().size > 0) {
+            //i can kill target
             if (meKill.size() > 0) {
-                //kill me ，need add select
-                int random = getRandom(meKill.size());
-                PackActor actor1 = canKillArray.get(random);
-                Array<PackActor> packActorArray = meKill.get(actor1);
-                PackActor actor2 = packActorArray.get(getRandom(packActorArray.size));
-                return new PackActor[]{actor1, actor2};
+                //kill me
+                PackActor srcActor = canKillArray.get(getRandom(meKill.size()));
+                Array<PackActor> packActorArray = meKill.get(srcActor);
+                PackActor targetActor = packActorArray.get(getRandom(packActorArray.size));
+                return new PackActor[]{srcActor, targetActor};
             }
-//            }else if (meKill.size()>0){
-//                //i kil
+//            else if (meKill.size()>0) {
+
+                //i kil
 //                int random = getRandom(killMe.size());
 //                PackActor actor1 = canKillArray.get(random);
 //                Array<PackActor> packActorArray = killMe.get(actor1);
 //                PackActor actor2 = packActorArray.get(getRandom(packActorArray.size));
 //                System.out.println("AI---- test be killss!!!");
 //                return new PackActor[]{actor1,actor2};
-            else {
+//            } else {
                 actor = fanpai();
                 return new PackActor[]{actor};
-            }
+//            }
         } else {
             //随机翻拍
             actor = fanpai();
             return new PackActor[]{actor};
+        }
+    }
+
+    public void move(HashMap<PackActor, Array<PackActor>> killMe){
+        //可以跑的路线
+        //.有危险
+        for (PackActor packActor : killMe.keySet()) {
+//            canMove(packActor);
+        }
+    }
+
+    private HashMap<PackActor,Array<Vector2>> canMove = new HashMap<PackActor,Array<Vector2>>();
+    private Array<PackActor> actors = new Array<>();
+    private void canMove(PackActor packActor,int arr[][]) {
+        canMove.clear();
+        actors.clear();
+        int tempX = packActor.getTempX();
+        int tempY = packActor.getTempY();
+        Array<Vector2> temp = new Array<>();
+        if (tempX-1>0&&arr[tempX-1][tempY] == 0) {
+            temp.add(new Vector2(tempX-1,tempY));
+        }
+        if (tempX+1<arr[0].length&&arr[tempX+1][tempY] == 0) {
+            temp.add(new Vector2(tempX+1,tempY));
+        }
+        if ((tempY-1)>=0&&arr[tempX][tempY-1] == 0) {
+            temp.add(new Vector2(tempX,tempY-1));
+        }
+        if ((tempY+1)<arr.length&&arr[tempX][tempY+1] == 0) {
+            temp.add(new Vector2(tempX,tempY+1));
+        }
+        if (temp.size>0) {
+            canMove.put(packActor, temp);
+            actors.add(packActor);
         }
     }
 
@@ -112,20 +148,15 @@ public class ComputateAI {
     private Array<PackActor> canKillMeArray;
     // 有没有可以吃的牌
     public HashMap<PackActor,Array<PackActor>> canKill(Array<PackActor> actors){
-        //我自己的牌
-        Array<PackActor> actors1 = selectCanKill(actors);
-        for (PackActor actor : actors1) {
-            System.out.println(actor.getNum()+"<<<<<======cancell");
-        }
+        //can kill target src
         canKillArray = new Array<>();
-        HashMap<PackActor,Array<PackActor>> hashMap = new HashMap<>();
-        for (int i = 0; i < actors1.size; i++) {
-            PackActor actor = actors1.get(i);
+        //select can kill
+        Array<PackActor> canKillAtor = selectCanKill(actors);
+        //can kill data    src ---> target
+        HashMap<PackActor,Array<PackActor>> canKillHashMap = new HashMap<>();
+        for (int i = 0; i < canKillAtor.size; i++) {
+            PackActor actor = canKillAtor.get(i);
             Array<PackActor> arrayActor = getArrayActor(actor);
-            System.out.println("=====");
-            for (PackActor packActor : arrayActor) {
-                System.out.println(actor.getTempY()+"x"+actor.getTempY()+"-"+packActor.getNum()+"-"+packActor.getTempY()+"-"+packActor.getTempX());
-            }
             if (arrayActor.size>0){
                 Array<PackActor> packActorArray = new Array<>();
                 //可以进行kill
@@ -135,14 +166,14 @@ public class ComputateAI {
                     }
                 }
                 if (packActorArray.size>0) {
-                    hashMap.put(actor, packActorArray);
+                    canKillHashMap.put(actor, packActorArray);
                     if (!canKillArray.contains(actor,false)) {
                         canKillArray.add(actor);
                     }
                 }
             }
         }
-        return hashMap;
+        return canKillHashMap;
     }
 
     private Array<PackActor> selectCanKill(Array<PackActor> actors) {
@@ -158,23 +189,24 @@ public class ComputateAI {
     // 有没有可以杀我的
     public HashMap<PackActor,Array<PackActor>> canKillMe(Array<PackActor> actors){
         //我自己的牌
+        Array<PackActor> valueActor = selectCanKill(actors);
         canKillMeArray = new Array<>();
         HashMap<PackActor,Array<PackActor>> hashMap = new HashMap<>();
-        for (int i = 0; i < actors.size; i++) {
+        for (int i = 0; i < valueActor.size; i++) {
             //我的牌，可以想吃的
-            PackActor actor = actors.get(i);
+            PackActor actor = valueActor.get(i);
             Array<PackActor> arrayActor = getArrayActor(actor);
             if (arrayActor.size>0){
                 Array<PackActor> packActorArray = new Array<>();
                 //可以进行kill
-                for (PackActor packActor : actorsTemp) {
+                for (PackActor packActor : arrayActor) {
                     if (kill(packActor,actor)) {
                         packActorArray.add(packActor);
                     }
                 }
                 if (packActorArray.size>0) {
                     hashMap.put(actor, packActorArray);
-//                    canKillArray.add(actor);
+                    canKillArray.add(actor);
                 }
             }
         }
@@ -183,6 +215,7 @@ public class ComputateAI {
 
 
     public boolean kill(PackActor last,PackActor target){
+        if (!target.isLive())return false;
         int num = target.getNum();
         if (last.getUseColor() != target.getUseColor())
         if (target.getNum() == 10&& last.getNum()==1){

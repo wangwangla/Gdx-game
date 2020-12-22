@@ -116,8 +116,6 @@ public class GameScreen extends BaseScreen {
 
             @Override
             public void passLevelPass(String text,boolean isClick) {
-                Constant.multServer.closed();
-                Constant.multClient.closed();
                 showPassLevel(text,isClick);
             }
 

@@ -408,8 +408,12 @@ public class GamePanel extends Group {
     private void checkPassLevel() {
         if (redPackActors.size<=0){
             updateListener.passLevelPass("black win",true);
+            Constant.multServer.closed();
+            Constant.multClient.closed();
         }else if (blackPackActors.size<=0){
             updateListener.passLevelPass("red win",true);
+            Constant.multServer.closed();
+            Constant.multClient.closed();
         }
     }
 

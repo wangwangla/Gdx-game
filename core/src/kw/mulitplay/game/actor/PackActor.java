@@ -71,7 +71,7 @@ public class PackActor extends Group {
         animalLabel.setColor(useColor);
         animalLabel.setAlignment(Align.center);
         animalLabel.setPosition(20,getHeight()-20, Align.center);
-//        addActor(fanPack);
+        addActor(fanPack);
         setXY(x,y);
     }
 

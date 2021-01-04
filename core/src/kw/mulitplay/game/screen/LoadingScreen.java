@@ -15,6 +15,7 @@ import kw.mulitplay.game.screen.base.BaseScreen;
 public class LoadingScreen extends BaseScreen {
     private AssetManager assetManager;
     private boolean out;
+    private float time;
 
     @Override
     protected void initView() {
@@ -24,7 +25,6 @@ public class LoadingScreen extends BaseScreen {
         image.setOrigin(Align.center);
         image.setScale(Constant.bgScale);
         image.setY(Constant.height/2,Align.center);
-        //init resource
         Constant.resource = new Resource();
     }
 
@@ -41,6 +41,7 @@ public class LoadingScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
+        time+=delta;
         enterNextScreen();
     }
 

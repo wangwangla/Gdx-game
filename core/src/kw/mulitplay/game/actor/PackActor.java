@@ -1,8 +1,10 @@
 package kw.mulitplay.game.actor;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -28,9 +30,10 @@ public class PackActor extends Group {
     private short currentStatus;
     private short ower;
     private boolean live = true;
+    private Image select;
     public PackActor(String name){
         setSize(160,185);
-        Image image = new Image(Resource.atlas.findRegion("white"));
+        Image image = new Image(Resource.atlas.findRegion("canmove"));
         setName(name);
         addActor(image);
         setVisible(false);
@@ -63,7 +66,7 @@ public class PackActor extends Group {
         fanPack.setPosition(getWidth()/2,getHeight()/2, Align.center);
         zhengPack = new Image(Resource.atlas.findRegion(num+""));
         addActor(zhengPack);
-        zhengPack.setVisible(false);
+        zhengPack.getColor().a = 0;
         zhengPack.setPosition(getWidth(),0,Align.bottomRight);
         name = data.getAnimalData().get(num);
         animalLabel = new Label(name,new Label.LabelStyle(){{font = FontResource.animalfont;}});
@@ -73,6 +76,10 @@ public class PackActor extends Group {
         animalLabel.setPosition(20,getHeight()-20, Align.center);
         addActor(fanPack);
         setXY(x,y);
+        select = new Image(Resource.atlas.findRegion("select"));
+        addActor(select);
+        select.setVisible(false);
+        select.setPosition(getWidth()/2,getHeight()/2,Align.center);
     }
 
     public int getTempX() {
@@ -95,8 +102,8 @@ public class PackActor extends Group {
 
     public void open(){
         currentStatus = Constant.ZHENGMIAN;
-        fanPack.setVisible(false);
-        zhengPack.setVisible(true);
+        fanPack.addAction(Actions.alpha(0,0.2F));
+        zhengPack.addAction(Actions.alpha(1,0.2F));
     }
 
     public void setListener(TachListener listener) {
@@ -120,6 +127,12 @@ public class PackActor extends Group {
 
     public Color getOtherColor() {
         return useColor == redColor ? blackColor : redColor;
+    }
+
+    public void setXYAnima(int x, int y) {
+        this.tempX = x;
+        this.tempY = y;
+        addAction(Actions.moveTo(x*(getWidth()+4.5F),y*(getHeight()+7),0.2F));
     }
 
     public interface TachListener{
@@ -153,5 +166,16 @@ public class PackActor extends Group {
     @Override
     public String toString() {
         return "name:"+getName()+",x:"+tempX+",y:"+tempY;
+    }
+
+    @Override
+    public void setScale(float scaleX,float scaleY) {
+        super.setScale(scaleX);
+        if (scaleY == 1F){
+            select.setVisible(false);
+        }else {
+            select.setVisible(true);
+            toFront();
+        }
     }
 }

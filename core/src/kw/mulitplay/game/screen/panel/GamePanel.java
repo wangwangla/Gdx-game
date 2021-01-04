@@ -282,7 +282,7 @@ public class GamePanel extends Group {
         PackActor last = packActors.getLast();
         arr[last.getTempX()][last.getTempY()] = 0;
         arr[tempX][tempY] = Integer.parseInt(last.getName());
-        last.setXY(tempX,tempY);
+        last.setXYAnima(tempX,tempY);
         last.setAnimalScale(1);
         target.setVisible(false);
         changePlayer();
@@ -378,7 +378,7 @@ public class GamePanel extends Group {
             }else if ((last.getNum() == 10&&num==1)||num>=last.getNum()){
                 target.appear();
                 removeTarget(target);
-                last.setXY(targetX,targetY);
+                last.setXYAnima(targetX,targetY);
                 arr[targetX][targetY] = arr[lastX][lastY];
                 arr[lastX][lastY] = 0;
                 last.setAnimalScale(1);
@@ -408,11 +408,18 @@ public class GamePanel extends Group {
     private void checkPassLevel() {
         if (redPackActors.size<=0){
             updateListener.passLevelPass("black win",true);
-            Constant.multServer.closed();
-            Constant.multClient.closed();
+            closedNet();
         }else if (blackPackActors.size<=0){
             updateListener.passLevelPass("red win",true);
+            closedNet();
+        }
+    }
+
+    public void closedNet(){
+        if (Constant.multServer!=null) {
             Constant.multServer.closed();
+        }
+        if (Constant.multClient!=null){
             Constant.multClient.closed();
         }
     }

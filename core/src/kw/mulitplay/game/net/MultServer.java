@@ -33,6 +33,8 @@ public class MultServer{
             @Override
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
+
+
                 if (object instanceof Message) {
                     Message object1 = (Message) object;
                     VectorPosition position = ((Message) object).getPosition();

@@ -6,6 +6,11 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.CpuSpriteBatch;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import kw.mulitplay.game.constant.Constant;
@@ -16,13 +21,11 @@ public class MulitPlayGame extends Game {
     @Override
     public void create() {
         initInstance();
-        //create viewport and as a constant
         setScreen(new LoadingScreen());
     }
 
     public void initInstance(){
         Constant.viewport = viewport = new ExtendViewport(720,1280);
-        // call to set value Constant.width and Constant.height
         resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         //create batch
         Constant.batch = new CpuSpriteBatch();

@@ -33,16 +33,24 @@ public class MultServer{
             @Override
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
+                /**
+                 * 传递的参数  s
+                 */
+
+
                 if (object instanceof Message) {
                     Message object1 = (Message) object;
-                    VectorPosition position = ((Message) object).getPosition();
-                    System.out.println("sever received"+object1.getName());
                     listener.action(object1);
                 }
             }
 
             @Override
             public void connected(Connection connection) {
+                /**
+                 * 如果没有链接连接，就增加
+                 * 如果有 就直接返回
+                 */
+
                 super.connected(connection);
                 if(array.size>0)return;   //保证只有一个连接上来
                 array.add(connection);

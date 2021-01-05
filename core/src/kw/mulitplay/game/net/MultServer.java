@@ -33,11 +33,10 @@ public class MultServer{
             @Override
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
+                System.out.println("=======>>> received");
                 /**
                  * 传递的参数  s
                  */
-
-
                 if (object instanceof Message) {
                     Message object1 = (Message) object;
                     listener.action(object1);
@@ -46,6 +45,7 @@ public class MultServer{
 
             @Override
             public void connected(Connection connection) {
+                System.out.println("=======>>> connect");
                 /**
                  * 如果没有链接连接，就增加
                  * 如果有 就直接返回
@@ -61,6 +61,7 @@ public class MultServer{
 
             @Override
             public void disconnected(Connection connection) {
+                System.out.println("=======>>> disconnection");
                 super.disconnected(connection);
                 array.removeValue(connection,true);
             }

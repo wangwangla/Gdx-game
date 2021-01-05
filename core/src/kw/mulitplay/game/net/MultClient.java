@@ -52,6 +52,7 @@ public class MultClient {
         client.addListener(new Listener() {
             @Override
             public void received (Connection connection, Object object) {
+                System.out.println("===========>>>> received");
                 if (object instanceof Message) {
                     Message message = (Message) object;
                     System.out.println("client message:"+message.getName());
@@ -64,12 +65,14 @@ public class MultClient {
             @Override
             public void connected(Connection connection) {
                 super.connected(connection);
+                System.out.println("===========>>>>>> connect");
             }
 
             @Override
             public void disconnected(Connection connection) {
                 super.disconnected(connection);
                 array.removeValue(connection,true);
+                System.out.println("=========>>>>>>>disconnect");
             }
         });
     }

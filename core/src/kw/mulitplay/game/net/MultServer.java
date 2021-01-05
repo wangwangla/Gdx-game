@@ -34,15 +34,12 @@ public class MultServer{
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
                 System.out.println("=======>>> received");
-                /**
-                 * 传递的参数
-                 */
                 if (object instanceof Message) {
+                    System.out.println("====>>>>>server play!");
                     Message message = (Message) object;
                     listener.play(message);
                 }
             }
-
 
             @Override
             public void connected(Connection connection) {

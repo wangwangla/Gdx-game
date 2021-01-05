@@ -63,25 +63,24 @@ public class GamePanel extends Group {
             arr = data.shuffle();
             MultServer server ;
             Constant.multServer = server = new MultServer();
-            Group shadowPanel = new Group();
             server.setListener(new NetListener() {
                 @Override
-                public Message action(Message message) {
-                    status = GameStatus.running;
+                public void sendGameData() {
+                    /**
+                     * 开局
+                     */
+                    super.sendGameData();
                     Message arrMessage = new Message(arr);
-                    shadowPanel.remove();
-                    Constant.multServer.setListener(new NetListener(){
-                        @Override
-                        public Message action(Message message) {
-                            runNetMethod(message);
-                            return super.action(message);
-                        }
+                    arrMessage.setType("START");
+                    Constant.multServer.sendMessage(arrMessage);
+                    updateListener.tipRemove();
+                }
 
-                        @Override
-                        public void start() {
-                            updateListener.tipRemove();
-                        }
-                    });
+
+
+                @Override
+                public Message action(Message message) {
+                    Message arrMessage = new Message(arr);
                     return arrMessage;
                 }
             });
@@ -118,28 +117,29 @@ public class GamePanel extends Group {
         Constant.multClient.setListener(new NetListener() {
             @Override
             public Message action(Message message) {
-                Gdx.app.postRunnable(()->{
-                    run(message);
-                    Constant.multClient.setListener(new NetListener() {
-                        @Override
-                            public Message action(Message message) {
-                                runNetMethod(message);
-                                return super.action(message);
-                            }
 
-                            @Override
-                            public void start() {
-                                updateListener.tipRemove();
-                            }
-                    });
-                });
                 return null;
             }
 
             @Override
-            public void start() {
-                super.start();
-                updateListener.tipRemove();
+            public void start(Message message) {
+                Gdx.app.postRunnable(()->{
+                    run(message);
+                    updateListener.tipRemove();
+//                    Constant.multClient.setListener(new NetListener() {
+//                        @Override
+//                        public Message action(Message message) {
+//                            runNetMethod(message);
+//                            return super.action(message);
+//                        }
+//
+//                        @Override
+//                        public void start(Message message) {
+//                            updateListener.tipRemove();
+//                        }
+//                    });
+                });
+//                updateListener.tipRemove();
             }
         });
     }

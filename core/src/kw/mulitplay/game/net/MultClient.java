@@ -55,10 +55,12 @@ public class MultClient {
                 System.out.println("===========>>>> received");
                 if (object instanceof Message) {
                     Message message = (Message) object;
-                    System.out.println("client message:"+message.getName());
+                    if (message.getType().equals("START")){
+                        listener.start(message);
+                    }
                     listener.action((Message)object);
                     if (array.size<=0)array.add(connection);
-                    listener.start();
+
                 }
             }
 
@@ -66,6 +68,7 @@ public class MultClient {
             public void connected(Connection connection) {
                 super.connected(connection);
                 System.out.println("===========>>>>>> connect");
+                array.add(connection);
             }
 
             @Override

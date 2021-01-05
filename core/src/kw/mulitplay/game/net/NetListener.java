@@ -4,5 +4,7 @@ import kw.mulitplay.game.net.message.Message;
 
 public class NetListener {
     public Message action(Message message){return null;}
-    public void start(){}
+    public void start(Message message){}
+
+    public void sendGameData(){}
 }

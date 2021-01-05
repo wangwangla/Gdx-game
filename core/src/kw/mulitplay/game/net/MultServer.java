@@ -34,6 +34,7 @@ public class MultServer{
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
                 System.out.println("=======>>> received");
+
                 /**
                  * 传递的参数  s
                  */
@@ -43,20 +44,13 @@ public class MultServer{
                 }
             }
 
+
             @Override
             public void connected(Connection connection) {
-                System.out.println("=======>>> connect");
-                /**
-                 * 如果没有链接连接，就增加
-                 * 如果有 就直接返回
-                 */
-
                 super.connected(connection);
-                if(array.size>0)return;   //保证只有一个连接上来
+                System.out.println("======>>>>connect");
                 array.add(connection);
-                Message action = listener.action(null);
-                sendMessage(action);
-                listener.start();
+                listener.sendGameData();
             }
 
             @Override

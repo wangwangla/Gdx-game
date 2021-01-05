@@ -26,31 +26,32 @@ import kw.mulitplay.game.screen.data.GameData;
 
 public class GamePanel extends Group {
     //上下左右提示框
-    private PackActor up = new PackActor("UP");
-    private PackActor down = new PackActor("DOWN");
-    private PackActor left = new PackActor("LEFT");
-    private PackActor right = new PackActor("RIGHT");
+    private PackActor upTip = new PackActor("UP");
+    private PackActor downTip = new PackActor("DOWN");
+    private PackActor leftTip = new PackActor("LEFT");
+    private PackActor rightTip = new PackActor("RIGHT");
 
     private Array<PackActor> redPackActors;
     private Array<PackActor> blackPackActors;
 
-    private Player A;
-    private Player B;
+    private Player playOne;
+    private Player playTwo;
     private Player currentPlay;  //默認一個玩家開始Nu
 
     private int arr[][];
     private GameData data;
-    private ArrayDeque<PackActor> packActors = new ArrayDeque<>(0);
+    private ArrayDeque<PackActor> currentSelect ;
     private ComputateAI ai;
 
     public GamePanel(GameData data){
         this.data = data;
+        this.currentSelect = new ArrayDeque<>(0);
         setName("gamePanel");
         initTable();
         ai = new ComputateAI();
     }
 
-    private void other(){
+    private void initGame(){
         initPlayer(); // 初始化玩家
         initPacker();  //初始化牌
         initTip();  // 初始化提示框
@@ -83,7 +84,7 @@ public class GamePanel extends Group {
                 }
             });
             updateListener.passLevelPass("wite player connect!",false);
-            other();
+            initGame();
         }else if (Constant.isServer == Constant.CLIENT){
             updateListener.passLevelPass("search server!!!",false);
             new Thread(new Runnable() {
@@ -107,7 +108,7 @@ public class GamePanel extends Group {
             }).start();
         }else {
             arr = data.shuffle();
-            other();
+            initGame();
         }
     }
 
@@ -132,7 +133,7 @@ public class GamePanel extends Group {
     public void showClient(Message message){
         arr = message.getArr();
         data.setArr(arr);
-        other();
+        initGame();
     }
 
     private void runNetMethod(Message message){
@@ -149,11 +150,11 @@ public class GamePanel extends Group {
 
     public boolean cancelTask(){
         if (Constant.isServer == Constant.SERVER){
-            if (currentPlay == B){
+            if (currentPlay == playTwo){
                 return false;
             }
         }else if (Constant.isServer == Constant.CLIENT){
-            if (currentPlay == A){
+            if (currentPlay == playOne){
                 return false;
             }
         }
@@ -161,10 +162,10 @@ public class GamePanel extends Group {
     }
 
     private void initTip() {
-        addActor(up);
-        addActor(down);
-        addActor(left);
-        addActor(right);
+        addActor(upTip);
+        addActor(downTip);
+        addActor(leftTip);
+        addActor(rightTip);
     }
 
     private Array<PackActor> all = new Array<>();
@@ -195,16 +196,16 @@ public class GamePanel extends Group {
     }
 
     private void initPlayer() {
-        A = new Player("play one");
-        B = new Player("play two");
-        currentPlay = A;
+        playOne = new Player("play one");
+        playTwo = new Player("play two");
+        currentPlay = playOne;
     }
 
     public void controller(){
-        up.setListener(NullListener);
-        down.setListener(NullListener);
-        left.setListener(NullListener);
-        right.setListener(NullListener);
+        upTip.setListener(NullListener);
+        downTip.setListener(NullListener);
+        leftTip.setListener(NullListener);
+        rightTip.setListener(NullListener);
     }
 
     public PackActor.TachListener NullListener = new PackActor.TachListener(){
@@ -247,11 +248,11 @@ public class GamePanel extends Group {
             fanPacker(target);
         }else {
             //如果已經有選中的
-            if (packActors.size()!=0){
+            if (currentSelect.size()!=0){
                 alreadySelected(target);
             }else {
                 if (currentPlay.OWNER != target.getOwer())return;
-                packActors.add(target);
+                currentSelect.add(target);
                 target.setAnimalScale(1.1F);
             }
             //提示
@@ -264,7 +265,7 @@ public class GamePanel extends Group {
         PackActor actor = target;
         int tempY = actor.getTempY();
         int tempX = actor.getTempX();
-        PackActor last = packActors.getLast();
+        PackActor last = currentSelect.getLast();
         arr[last.getTempX()][last.getTempY()] = 0;
         arr[tempX][tempY] = Integer.parseInt(last.getName());
         last.setXY(tempX,tempY);
@@ -274,7 +275,7 @@ public class GamePanel extends Group {
     }
 
     private void changePosition(PackActor last,int tempX,int tempY) {
-        packActors.clear();
+        currentSelect.clear();
         arr[last.getTempX()][last.getTempY()] = 0;
         arr[tempX][tempY] = Integer.parseInt(last.getName());
         last.setXY(tempX,tempY);
@@ -286,15 +287,17 @@ public class GamePanel extends Group {
         if (status == GameStatus.win) {
             return;
         }
-        if (currentPlay == A){
-            currentPlay = B;
+        if (currentPlay == playOne){
+            currentPlay = playTwo;
             updateListener.touch(false);
-            addAction(Actions.delay(1, Actions.run(()->{
-//                AI();
-                updateListener.touch(true);
-            })));
+            if (Constant.isServer == Constant.NOMAL) {
+                addAction(Actions.delay(1, Actions.run(() -> {
+                    AI();
+                    updateListener.touch(true);
+                })));
+            }
         }else {
-            currentPlay = A;
+            currentPlay = playOne;
         }
         updateListener.updatePlayer(currentPlay);
     }
@@ -318,40 +321,40 @@ public class GamePanel extends Group {
     };
 
     private void tip() {
-        if (packActors.size() == 0) {
+        if (currentSelect.size() == 0) {
             return;
         }
-        PackActor last = packActors.getLast();
+        PackActor last = currentSelect.getLast();
         int tempX = last.getTempX();
         int tempY = last.getTempY();
         if (tempX+1<4){
             if (arr[tempX + 1][tempY] == 0) {
-                right.setXY(tempX+1,tempY);
-                right.setVisible(true);
+                rightTip.setXY(tempX+1,tempY);
+                rightTip.setVisible(true);
             }
         }
         if (tempX-1>=0){
             if (arr[tempX-1][tempY] == 0) {
-                left.setXY(tempX-1,tempY);
-                left.setVisible(true);
+                leftTip.setXY(tempX-1,tempY);
+                leftTip.setVisible(true);
             }
         }
         if (tempY + 1<5){
             if (arr[tempX][tempY+1] == 0) {
-                up.setXY(tempX,tempY+1);
-                up.setVisible(true);
+                upTip.setXY(tempX,tempY+1);
+                upTip.setVisible(true);
             }
         }
         if (tempY - 1>=0){
             if (arr[tempX][tempY-1] == 0) {
-                down.setXY(tempX,tempY-1);
-                down.setVisible(true);
+                downTip.setXY(tempX,tempY-1);
+                downTip.setVisible(true);
             }
         }
     }
 
     private void alreadySelected(PackActor target) {
-        PackActor last = packActors.getLast();
+        PackActor last = currentSelect.getLast();
         int lastX = last.getTempX();
         int lastY = last.getTempY();
         int targetX = target.getTempX();
@@ -378,7 +381,7 @@ public class GamePanel extends Group {
         }
         last.setAnimalScale(1);
         if (currentPlay.OWNER != target.getOwer())return;
-        packActors.add(target);
+        currentSelect.add(target);
         target.setAnimalScale(1.1F);
     }
 
@@ -436,17 +439,17 @@ public class GamePanel extends Group {
     private void fanPacker(PackActor target) {
         target.open();
         // 默認playA是第一個節拍的
-        if (A.OWNER == -1) {
-            A.OWNER = target.getOwer();
-            A.color = target.getUseColor();
-            B.OWNER = (short) (1-target.getOwer());
-            B.color = target.getOtherColor();
+        if (playOne.OWNER == -1) {
+            playOne.OWNER = target.getOwer();
+            playOne.color = target.getUseColor();
+            playTwo.OWNER = (short) (1-target.getOwer());
+            playTwo.color = target.getOtherColor();
         }
 
-        if (packActors.size()!=0){
-            PackActor last = packActors.getLast();
+        if (currentSelect.size()!=0){
+            PackActor last = currentSelect.getLast();
             last.setAnimalScale(1);
-            packActors.clear();
+            currentSelect.clear();
         }
         changePlayer();
         return;
@@ -462,11 +465,11 @@ public class GamePanel extends Group {
     }
 
     private void resetTip(boolean isClear){
-        if (isClear)  packActors.clear();
-        up.setVisible(false);
-        down.setVisible(false);
-        left.setVisible(false);
-        right.setVisible(false);
+        if (isClear)  currentSelect.clear();
+        upTip.setVisible(false);
+        downTip.setVisible(false);
+        leftTip.setVisible(false);
+        rightTip.setVisible(false);
     }
 
     public void setListener(Listener listener) {

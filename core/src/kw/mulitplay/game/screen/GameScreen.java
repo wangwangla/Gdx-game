@@ -38,7 +38,6 @@ public class GameScreen extends BaseScreen {
     @Override
     protected void initView() {
        commonView();
-        //note : this class important
         startGame();
     }
 
@@ -86,13 +85,6 @@ public class GameScreen extends BaseScreen {
         panel.setPosition(Constant.width/2+3,Constant.height*0.42F,Align.center);
         stage.addActor(panel);
         addGamePanelListener();
-        timeLabel.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                panel.AI();
-            }
-        });
     }
 
     @Override
@@ -198,7 +190,6 @@ public class GameScreen extends BaseScreen {
 
 
     public void showPassLevel(String text,boolean addClick) {
-//        status = GamePanel.GameStatus.win;
         Group group = new Group();
         group.setName("shadow");
         group.setSize(Constant.width, Constant.height);
@@ -229,8 +220,9 @@ public class GameScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 group.remove();
-                startGame();
+                enterScreen(new MainScreen());
                 group.removeListener(this);
+                Constant.isServer = Constant.NOMAL;
             }
         });
     }

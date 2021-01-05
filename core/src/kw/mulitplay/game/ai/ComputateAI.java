@@ -11,7 +11,7 @@ import kw.mulitplay.game.constant.Constant;
 
 public class ComputateAI {
     // 有没有翻起的牌
-    private Array<PackActor> list;
+    private Array<PackActor> currentPlayList;
     private int status;
     private Array<PackActor> actorsTemp;
     private Color computerColor;
@@ -21,27 +21,25 @@ public class ComputateAI {
     }
 
     public PackActor[] excete(Array<PackActor> actors, Color color, int[][] arr) {
-        //use color
+        //current use color
         this.computerColor = color;
-        //所有的
+        //all actor
         this.actorsTemp = actors;
-        //找出符合当前用户的牌
-        this.list = select(actors);
+        //find current actor
+        this.currentPlayList = findCurrentPlayer(actors);
         PackActor actor = null;
         //kill me
         this.arr = arr;
-        HashMap<PackActor, Array<PackActor>> meKill = canKill(list);
-        HashMap<PackActor, Array<PackActor>> killMe = canKillMe(list);
+        HashMap<PackActor, Array<PackActor>> meKill = canKill(currentPlayList);
+        HashMap<PackActor, Array<PackActor>> killMe = canKillMe(currentPlayList);
+        /**
+         * 当前步可以杀死的
+         */
         System.out.println("=======i can kill==========");
         for (PackActor packActor : meKill.keySet()) {
             System.out.println(packActor.toString());
         }
-        System.out.println("=======i can kill==========");
-//        System.out.println("=======i be killed==========");
-//        for (PackActor packActor : killMe.keySet()) {
-//            System.out.println(packActor.toString());
-//        }
-//        System.out.println("=======i be killed==========");
+        System.out.println("=======kill me==========");
         if (isAlreadyFan().size > 0) {
             //i can kill target
             if (meKill.size() > 0) {
@@ -84,7 +82,7 @@ public class ComputateAI {
                     //可以找所有可以移动的进行移动
 
                     System.out.println("pao bu l!!!!");
-                    allMove(list);
+                    allMove(currentPlayList);
                 }
 
                 if (this.actorsAll.size>0){
@@ -93,7 +91,7 @@ public class ComputateAI {
                     return null;
                 }else {
                     System.out.println("wandan!!!!");
-                    allMove(list);
+                    allMove(currentPlayList);
                 }
                 actor = fanpai();
                 if (actor == null){
@@ -109,7 +107,7 @@ public class ComputateAI {
                 }else {
                     return new PackActor[]{actor};
                 }
-                allMove(list);
+                allMove(currentPlayList);
                 return null;
             }
         } else {
@@ -190,7 +188,7 @@ public class ComputateAI {
             return actor;
         }catch (Exception e){
             System.out.println("=============errpr");
-            allMove(list);
+            allMove(currentPlayList);
         }
         return null;
     }
@@ -202,7 +200,7 @@ public class ComputateAI {
     }
 
 
-    public Array<PackActor> select(Array<PackActor> actors){
+    public Array<PackActor> findCurrentPlayer(Array<PackActor> actors){
         Array<PackActor> actorsTemp = new Array<>();
         for (PackActor actor : actors) {
             if (actor.getUseColor() == computerColor){
@@ -218,7 +216,7 @@ public class ComputateAI {
 
     public Array<PackActor> isAlreadyFan(){
         Array<PackActor> fan = new Array<>();
-        for (PackActor actor : list) {
+        for (PackActor actor : currentPlayList) {
             if (actor.getCurrentStatus() == Constant.ZHENGMIAN){
                 fan.add(actor);
             }
@@ -232,7 +230,7 @@ public class ComputateAI {
     public HashMap<PackActor,Array<PackActor>> canKill(Array<PackActor> actors){
         //can kill target src
         canKillArray = new Array<>();
-        //select can kill
+        //找到有资格的
         Array<PackActor> canKillAtor = selectCanKill(actors);
         //can kill data    src ---> target
         HashMap<PackActor,Array<PackActor>> canKillHashMap = new HashMap<>();
@@ -361,7 +359,7 @@ public class ComputateAI {
     }
 
     public PackActor getActor(int x,int y){
-        for (PackActor actor : list) {
+        for (PackActor actor : currentPlayList) {
             if (actor.getStatus()&&comparePosition(x,y,actor.getTempX(),actor.getTempY())){
                 return actor;
             }

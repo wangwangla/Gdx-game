@@ -58,9 +58,11 @@ public class MultClient {
                     if (message.getType().equals("START")){
                         listener.start(message);
                     }else {
+                        System.out.println("====>>>>"+message.getName());
                         listener.play(message);
                     }
                 }
+                if (array.size<1) array.add(connection);
             }
 
             @Override
@@ -82,7 +84,7 @@ public class MultClient {
     public void senMessage(Message message){
         for (Connection connection : array) {
             connection.sendTCP(message);
-            System.out.println(message.getName());
+            System.out.println(message.getName()+"=========client send!");
         }
     }
 

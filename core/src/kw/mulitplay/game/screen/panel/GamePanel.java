@@ -120,6 +120,12 @@ public class GamePanel extends Group {
                     updateListener.tipRemove();
                 });
             }
+
+            @Override
+            public void play(Message message) {
+                super.play(message);
+                runNetMethod(message);
+            }
         });
     }
 

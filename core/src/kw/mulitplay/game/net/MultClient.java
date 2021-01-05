@@ -57,10 +57,9 @@ public class MultClient {
                     Message message = (Message) object;
                     if (message.getType().equals("START")){
                         listener.start(message);
+                    }else {
+                        listener.play(message);
                     }
-                    listener.action((Message)object);
-                    if (array.size<=0)array.add(connection);
-
                 }
             }
 

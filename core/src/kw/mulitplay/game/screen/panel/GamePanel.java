@@ -76,12 +76,10 @@ public class GamePanel extends Group {
                     updateListener.tipRemove();
                 }
 
-
-
                 @Override
-                public Message action(Message message) {
-                    Message arrMessage = new Message(arr);
-                    return arrMessage;
+                public void play(Message message) {
+                    super.play(message);
+                    runNetMethod(message);
                 }
             });
             updateListener.passLevelPass("wite player connect!",false);
@@ -116,35 +114,16 @@ public class GamePanel extends Group {
     public void clientSetListener(){
         Constant.multClient.setListener(new NetListener() {
             @Override
-            public Message action(Message message) {
-
-                return null;
-            }
-
-            @Override
             public void start(Message message) {
                 Gdx.app.postRunnable(()->{
-                    run(message);
+                    showClient(message);
                     updateListener.tipRemove();
-//                    Constant.multClient.setListener(new NetListener() {
-//                        @Override
-//                        public Message action(Message message) {
-//                            runNetMethod(message);
-//                            return super.action(message);
-//                        }
-//
-//                        @Override
-//                        public void start(Message message) {
-//                            updateListener.tipRemove();
-//                        }
-//                    });
                 });
-//                updateListener.tipRemove();
             }
         });
     }
 
-    public void run(Message message){
+    public void showClient(Message message){
         arr = message.getArr();
         data.setArr(arr);
         other();
@@ -305,7 +284,7 @@ public class GamePanel extends Group {
             currentPlay = B;
             updateListener.touch(false);
             addAction(Actions.delay(1, Actions.run(()->{
-                AI();
+//                AI();
                 updateListener.touch(true);
             })));
         }else {
@@ -331,6 +310,7 @@ public class GamePanel extends Group {
             excute(target);
         }
     };
+
     private void tip() {
         if (packActors.size() == 0) {
             return;
